@@ -1,0 +1,182 @@
+// bower:scss
+// endbower
+
+$top : -750px;
+$left: -750px;
+$width: 1500px;
+$arm_end_pos : -24deg;
+
+@mixin center($width){
+    position: absolute;
+    top:50%;
+    left:50%;
+    margin:-($width/2) 0 0 -($width/2);
+    margin-left:-($width/2);
+    width:$width;
+}
+
+@import "modules/spinner";
+@import "modules/switch";
+
+body,html{
+    height:100%;
+}
+
+body {
+    background: #333;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #333;
+    //display:flex;
+    //flex-direction: rows;
+    overflow:hidden;
+}
+
+body section{
+    height:100%;
+    width:100%;
+    background:#222;
+    //overflow:hidden;
+    position:relative;
+}
+
+img{
+    max-width:100%;
+    height:auto;
+}
+
+nav{
+    position: fixed;
+    top:10px;
+    left:10px;
+    background:white;
+}
+
+section#contact{
+
+    .phone{
+        
+        .ring{
+            width:400px;
+            height:400px;
+            margin: auto;
+            position:absolute;
+            top:50%;
+            left:50%;
+            margin:-200px 0 0 -200px;
+            background: transparent url(../images/phonering.png);
+            background-size:contain;
+            background-position: center center;
+        }
+
+        .stopper{
+            position:absolute;
+            bottom:406px;
+            right:567px;
+            background: transparent url(../images/stopper.png);
+            background-size:contain;
+            background-position: center center;
+        }
+    }
+
+}
+
+section#video{
+
+    position:relative;
+
+    .tv{
+
+        width:1000px;
+        height:100%;
+        position:relative;
+        margin:0 auto;
+
+        .frame{
+            width:100%;
+            height:100%;
+            background: transparent url(../images/tv2.png);
+            background-size:contain;
+            background-position: center center;
+            background-repeat: no-repeat;
+            z-index:8;
+            position: relative;
+          
+
+            ul.channels{
+                padding:5px;
+                margin:0;
+                width:210px;
+                height:40px;
+                position:absolute;
+                right:72px;
+                top:524px;
+                
+
+                >li{
+                    float:left;
+                    margin-right:5px;
+
+                    >a{
+                        background:#ff4732;
+                        opacity: 0;
+                        width:30px;
+                        height:30px;
+                        border-radius:50%;
+                        display:block;
+                        
+                        &:hover{
+                            opacity: .2;
+                        }
+                    }
+                }
+            }
+
+            .sliders{
+
+                width:145px;
+                height:120px;
+                position:absolute;
+                right:118px;
+                top:350px;
+
+
+                img{
+                    width:20px;
+                }
+
+                >div{
+                    float:right;
+                    margin-left:16px;
+
+
+                    &:last-child{
+                        margin:0;
+                    }
+                }
+
+
+            }
+        }
+
+        .youtube{
+            background: transparent url(../images/noise.gif) no-repeat;
+            background-size:cover;
+            width:555px;
+            height:433px;
+            position:absolute;
+            top:50%;
+            left:100px;
+            margin-top: -230px;
+
+            & iframe,
+            & object,
+            & embed {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+}

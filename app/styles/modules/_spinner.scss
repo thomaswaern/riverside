@@ -1,0 +1,78 @@
+.spinner{
+	overflow:hidden;
+	height:100%;
+}
+
+.record{
+	background:#121113;
+	background:url('/images/disc2.jpg')no-repeat center center;
+	background-size:100%;
+	border-radius:50%;
+	border:4px solid #000;
+	width:$width;
+	height:0;
+	position: absolute;
+	left:$left;
+	top:$top;
+	padding-bottom:$width;
+	margin-bottom: -9999px;
+
+	label{
+		background:url('/images/label.gif')no-repeat center center;
+		background-size:100%;
+		display:block;
+		@include center(30%);
+		height:30%;
+		border-radius:50%;
+		text-align:center;
+		font-family: 'Rye', cursive;
+
+		.artist{
+			position: absolute;
+			top:15%;
+			left:50%;
+			margin-left:-25%;
+			width:50%;
+			color:#d9dada;
+		}
+
+		.title{
+			position: absolute;
+			top:58%;
+			left:50%;
+			margin-left:-25%;
+			width:50%;
+
+		}
+	}
+
+}
+
+.hole{
+	background:black;
+	@include center(3%);
+	height:3%;
+	border-radius:50%;
+}
+
+
+.kitten{
+	border:10px 10px 30px solid white;
+	position: absolute;
+	top:60%;
+	left:60%;
+	z-index: 9999;
+}
+
+.arm{
+	width:600px;
+	height:600px;
+	background: url('/images/arm.png')no-repeat center center;
+	background-size:100%;
+	position: absolute;
+	left:-260px;
+	top:-210px;
+	-webkit-transform-origin:100% -200px;
+	-webkit-transform: rotate($arm_end_pos);
+
+}
