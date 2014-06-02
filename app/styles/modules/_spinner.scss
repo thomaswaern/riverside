@@ -5,7 +5,7 @@
 
 .record{
 	background:#121113;
-	background:url('/images/disc2.jpg')no-repeat center center;
+	background:url('/images/disc2.jpg') no-repeat center center;
 	background-size:100%;
 	border-radius:50%;
 	border:4px solid #000;
@@ -18,7 +18,7 @@
 	margin-bottom: -9999px;
 
 	label{
-		background:url('/images/label.gif')no-repeat center center;
+		background:url('/images/label.gif') no-repeat center center;
 		background-size:100%;
 		display:block;
 		@include center(30%);
@@ -67,7 +67,7 @@
 .arm{
 	width:600px;
 	height:600px;
-	background: url('/images/arm.png')no-repeat center center;
+	background: url('/images/arm.png') no-repeat center center;
 	background-size:100%;
 	position: absolute;
 	left:-260px;
