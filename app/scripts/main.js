@@ -13,6 +13,9 @@ $(function () {
             }
         }
     });
+
+    Draggable.create(".ring", {type: "rotation", throwProps: true});
+
 });
 
 var app;
