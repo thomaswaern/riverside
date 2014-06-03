@@ -76,3 +76,66 @@
 	-webkit-transform: rotate($arm_end_pos);
 
 }
+
+
+.slider{
+	position: absolute;
+	top:210px;
+	left:220px;
+	width:580px;
+	-webkit-transform: rotate(-8deg);
+
+	&.noUi-background{
+		background: none;
+		border:0;
+		box-shadow:none;
+	}
+
+	.noUi-handle{
+		width:100px;
+		height:100px;
+		border-radius:50%;
+		padding:0;
+		left:-40px;
+		top:-37px;
+		border:0;
+		opacity:0;
+		cursor:ew-resize;
+		background:red;
+		border:0;
+		&::before,&::after{
+			display:none;
+		}
+
+	}
+}
+
+
+button.play{
+	padding:2em;
+	position: absolute;
+	right:10px;
+	top:10px;
+	widht:100px;
+	height:100px;
+	background: white;
+	border:0;
+}
+
+.record_spec{
+	background:#121113;
+	background:url('../images/disc.gif')no-repeat center center;
+	background-size:100%;
+	border-radius:50%;
+	border:4px solid #000;
+	width:$width;
+	height:0;
+	position: absolute;
+	left:$left;
+	top:$top;
+	padding-bottom:$width;
+	margin-bottom: -9999px;
+	opacity:.4;
+	-webkit-box-shadow: 1px 1px 1px 1px #000;
+	box-shadow: 1px 1px 1px 1px #000;
+}

@@ -15,6 +15,34 @@ $arm_end_pos : -24deg;
     width:$width;
 }
 
+
+@-webkit-keyframes rotating {
+    from{
+        -webkit-transform: rotate(0deg);
+    }
+    to{
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+
+@-webkit-keyframes initarm {
+    from{
+        -webkit-transform: rotate(-70deg);
+    }
+    to{
+        -webkit-transform: rotate($arm_end_pos);
+    }
+}
+
+@-webkit-keyframes wobblearm  {
+  0%  { -webkit-transform:  rotate($arm_end_pos); }
+  20%  { -webkit-transform:  rotate($arm_end_pos - .12); }
+  50%  { -webkit-transform:  rotate($arm_end_pos + .12); }
+  100%  { -webkit-transform:  rotate($arm_end_pos); }
+}
+
+
 @import "modules/spinner";
 @import "modules/switch";
 
