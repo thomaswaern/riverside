@@ -18,17 +18,17 @@ $(function () {
                         if(app.currentPage !== 'audio'){
                             app.prepare();
                         }
-                    break;
+                        break;
 
                     case 'video':
                         app.stopAllSounds();
                         $('.slider').val(24, true);
-                    break;
+                        break;
 
                     case 'contact':
                         app.stopAllSounds();
                         $('.slider').val(24, true);
-                    break;
+                        break;
 
                 }
 
