@@ -1,4 +1,7 @@
 'use strict';
+
+var app;
+
 $(function () {
 
     $('a[href*=#]:not([href=#])').click(function () {
@@ -6,28 +9,55 @@ $(function () {
             var target = $(this.hash);
             target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
             if (target.length) {
+
+                console.log(this.hash.slice(1));
+
+                switch(this.hash.slice(1)){
+
+                    case 'audio':
+                        if(app.currentPage !== 'audio'){
+                            app.prepare();
+                        }
+                    break;
+
+                    case 'video':
+                        app.stopAllSounds();
+                        $('.slider').val(24, true);
+                    break;
+
+                    case 'contact':
+                        app.stopAllSounds();
+                        $('.slider').val(24, true);
+                    break;
+
+                }
+
+
                 $('html,body').animate({
                     scrollTop: target.offset().top
                 }, 500);
+                
                 return false;
             }
         }
     });
 
-    Draggable.create(".ring", {type: "rotation", throwProps: true});
+    Draggable.create('.ring', {type: 'rotation', throwProps: true});
 
 });
 
-var app;
+
 
 var App = function ($) {
 
     var soundEffects = {
-        crackling: new Audio('/sounds/needle.ogg'),
-        end: new Audio('/sounds/endloop.ogg')
+        crackling: new Audio('../sounds/needle.ogg'),
+        end: new Audio('../sounds/endloop.ogg')
     };
 
     var tracks = [];
+
+    var currentPage = 'audio';
 
     var soundObject;
 
