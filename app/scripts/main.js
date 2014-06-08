@@ -1,12 +1,13 @@
 'use strict';
 
-var app, record;
+var app, record, television;
 
 $(function () {
 
     $('a[href*=#]:not([href=#])').on('click',function () {
 
         var target = this.hash.slice(1);
+        var callback;
 
         switch(target){
 
@@ -14,23 +15,25 @@ $(function () {
                 if(app.currentPage !== 'audio'){
                     record.playSoundEffect('end', true);
                 }
+                callback = record.prepare;
                 break;
 
             case 'video':
                 record.stopAllSounds();
                 //$('.slider').val(24, true);
-
+                callback = function(){console.log('tv prepare')};
                 break;
 
             case 'contact':
                 record.stopAllSounds();
                 //$('.slider').val(24, true);
-
+                callback = function(){console.log('contact prepare')};
                 break;
 
         }
-        app.setCurrentPage(target);
-        app.load(target);
+
+        app.load(target, callback);
+
 
     });
 
@@ -48,41 +51,76 @@ var App = function ($) {
             return this._currentPage;
         },
 
-        setCurrentPage: function (page) {
-            _currentPage = page;
+        init : function(callback){
+            var f = callback;
+            f();
         },
 
-        load : function(part){
+        load : function(part, callback){
 
-            console.log('preparing load');
+            //this._currentPage(part);
+            app._initMethod = callback;
+
             $.ajax({
                 context: this,
                 dataType : 'html',
                 url : 'templates/'+part+'.html',
-                error: function (request, status, error) {
-                    console.log('error');
-                },
-                success : function(results) {
 
-                    console.log('loaded');
+                success : function(results) {
 
                     $('#wrapper').html(results);
 
-                    SC.whenStreamingReady(function () {
-                        setTimeout(function () {
-                            SC.get('/playlists/2373914', function (playlist) {
-                                record.setTracks(playlist.tracks);
-                                //console.log(playlist);
-                            }.bind(this));
-                        }.bind(this), 2200);
-
-                    });
-                    record.prepare();
+                    app.init(callback);
                 }
             });
         }
     };
 };
+
+var Television = function ($) {
+
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    var player;
+    var done = false;
+
+    var onYouTubeIframeAPIReady = function() {
+        player = new YT.Player('player', {
+          height: '390',
+          width: '640',
+          videoId: '1zDvDKufc80',
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+    }
+
+    var onPlayerStateChange = function(event) {
+        if (event.data == YT.PlayerState.PLAYING && !done) {
+          setTimeout(stopVideo, 6000);
+          done = true;
+        }
+    }
+
+    function stopVideo() {
+        this.player.stopVideo();
+    }
+
+    var onPlayerReady = function(event) {
+        event.target.playVideo();
+    }
+
+    return{
+
+        stop : this.stopVideo
+    }
+
+}
 
 var Record = function ($) {
 
@@ -160,6 +198,16 @@ var Record = function ($) {
 
             console.log('preparing sliders');
 
+            SC.whenStreamingReady(function () {
+                setTimeout(function () {
+                    SC.get('/playlists/2373914', function (playlist) {
+                        record.setTracks(playlist.tracks);
+                        //console.log(playlist);
+                    }.bind(this));
+                }.bind(this), 2200);
+
+            });
+
             //var track = this.setCurrentTrack(0);
 
             $('.slider').noUiSlider({
@@ -203,7 +251,7 @@ var Record = function ($) {
             //.css('display','block')
             //.css('-webkit-animation', 'initarm 2s linear 1');
             //
-            this.playSoundEffect('end', true);
+            record.playSoundEffect('end', true);
 
         },
 
@@ -329,4 +377,5 @@ var Record = function ($) {
 
 app = new App(jQuery);
 record = new Record(jQuery);
-app.load('audio');
+television = new Television(jQuery);
+app.load('audio', record.prepare);
