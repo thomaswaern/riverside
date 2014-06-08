@@ -1,9 +1,11 @@
 // bower:scss
 // endbower
 
-$top : -750px;
-$left: -750px;
-$width: 1500px;
+
+
+/* $top : - ($width/2);
+$left: - ($width/2); */
+
 $arm_end_pos : -24deg;
 
 @mixin center($width){
@@ -15,7 +17,6 @@ $arm_end_pos : -24deg;
     width:$width;
 }
 
-
 @-webkit-keyframes rotating {
     from{
         -webkit-transform: rotate(0deg);
@@ -24,7 +25,6 @@ $arm_end_pos : -24deg;
         -webkit-transform: rotate(360deg);
     }
 }
-
 
 @-webkit-keyframes initarm {
     from{
@@ -79,10 +79,13 @@ nav{
     background:white;
 }
 
-section#contact{
+#wrapper{
+    height:100%;
+}
+
 
     .phone{
-        
+
         .ring{
             width:400px;
             height:400px;
@@ -106,55 +109,52 @@ section#contact{
         }
     }
 
-}
 
-section#video{
-
-    position:relative;
 
     .tv{
-
-        width:1000px;
+        width:100%;
         height:100%;
-        position:relative;
-        margin:0 auto;
-
         .frame{
-            width:100%;
-            height:100%;
+            width:80%;
+            height:0;
+            padding-bottom:50%;
             background: transparent url(../images/tv2.png);
             background-size:contain;
-            background-position: center center;
+            background-position:center center;
             background-repeat: no-repeat;
             z-index:8;
             position: relative;
-          
+            margin:0 auto;
+            pointer-events: none;
 
             ul.channels{
-                padding:5px;
+                background:yellow;
                 margin:0;
-                width:210px;
-                height:40px;
+                width:18%;
+                height:0;
+                padding:0;
+                padding-bottom:6%;
                 position:absolute;
-                right:72px;
-                top:524px;
-                
+                left:66.7%;
+                opacity:0.5;
+                list-style:none;
+                padding-left:0.6%;
+                bottom:13%;
 
                 >li{
+                    display:inline-block;
+                    margin-right:0.9%;
+                    margin-top:12%;
                     float:left;
-                    margin-right:5px;
+                    background:red;
 
                     >a{
-                        background:#ff4732;
-                        opacity: 0;
-                        width:30px;
-                        height:30px;
+                        background:green;
                         border-radius:50%;
                         display:block;
-                        
-                        &:hover{
-                            opacity: .2;
-                        }
+                        width:13%;
+                        height:0;
+                        padding-bottom:13%;
                     }
                 }
             }
@@ -189,12 +189,15 @@ section#video{
         .youtube{
             background: transparent url(../images/noise.gif) no-repeat;
             background-size:cover;
-            width:555px;
-            height:433px;
+            width:50%;
+            height:0;
+            left:50%;
+            top:0;
+            margin-top:3%;
+            margin-left:-35%;
+            padding-bottom:45%;
+            overflow:hidden;
             position:absolute;
-            top:50%;
-            left:100px;
-            margin-top: -230px;
 
             & iframe,
             & object,
@@ -207,4 +210,4 @@ section#video{
             }
         }
     }
-}
+

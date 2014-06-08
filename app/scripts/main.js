@@ -1,54 +1,90 @@
 'use strict';
 
-var app;
+var app, record;
 
 $(function () {
 
-    $('a[href*=#]:not([href=#])').click(function () {
-        if (location.pathname.replace(/^\//, '') === this.pathname.replace(/^\//, '') && location.hostname === this.hostname) {
-            var target = $(this.hash);
-            target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
-            if (target.length) {
+    $('a[href*=#]:not([href=#])').on('click',function () {
 
-                console.log(this.hash.slice(1));
+        var target = this.hash.slice(1);
 
-                switch(this.hash.slice(1)){
+        switch(target){
 
-                    case 'audio':
-                        if(app.currentPage !== 'audio'){
-                            app.prepare();
-                        }
-                        break;
-
-                    case 'video':
-                        app.stopAllSounds();
-                        $('.slider').val(24, true);
-                        break;
-
-                    case 'contact':
-                        app.stopAllSounds();
-                        $('.slider').val(24, true);
-                        break;
-
+            case 'audio':
+                if(app.currentPage !== 'audio'){
+                    record.playSoundEffect('end', true);
                 }
+                break;
 
+            case 'video':
+                record.stopAllSounds();
+                //$('.slider').val(24, true);
 
-                $('html,body').animate({
-                    scrollTop: target.offset().top
-                }, 500);
-                
-                return false;
-            }
+                break;
+
+            case 'contact':
+                record.stopAllSounds();
+                //$('.slider').val(24, true);
+
+                break;
+
         }
+        app.setCurrentPage(target);
+        app.load(target);
+
     });
 
-    Draggable.create('.ring', {type: 'rotation', throwProps: true});
+    //Draggable.create('.ring', {type: 'rotation', throwProps: true});
 
 });
 
-
-
 var App = function ($) {
+
+    var _currentPage = 'audio';
+
+    return{
+
+        getCurrentPage: function () {
+            return this._currentPage;
+        },
+
+        setCurrentPage: function (page) {
+            _currentPage = page;
+        },
+
+        load : function(part){
+
+            console.log('preparing load');
+            $.ajax({
+                context: this,
+                dataType : 'html',
+                url : 'templates/'+part+'.html',
+                error: function (request, status, error) {
+                    console.log('error');
+                },
+                success : function(results) {
+
+                    console.log('loaded');
+
+                    $('#wrapper').html(results);
+
+                    SC.whenStreamingReady(function () {
+                        setTimeout(function () {
+                            SC.get('/playlists/2373914', function (playlist) {
+                                record.setTracks(playlist.tracks);
+                                //console.log(playlist);
+                            }.bind(this));
+                        }.bind(this), 2200);
+
+                    });
+                    record.prepare();
+                }
+            });
+        }
+    };
+};
+
+var Record = function ($) {
 
     var soundEffects = {
         crackling: new Audio('../sounds/needle.ogg'),
@@ -56,8 +92,6 @@ var App = function ($) {
     };
 
     var tracks = [];
-
-    var currentPage = 'audio';
 
     var soundObject;
 
@@ -122,8 +156,9 @@ var App = function ($) {
             $('.slider').val(value + 24, true);
         },
 
-
         prepare: function () {
+
+            console.log('preparing sliders');
 
             //var track = this.setCurrentTrack(0);
 
@@ -140,13 +175,13 @@ var App = function ($) {
 
             $('.slider').change(function (e) {
                 console.log('change');
-                app.armMoving = false;
-                app.setPosition($(e.target).val(), 24, 75);
+                record.armMoving = false;
+                record.setPosition($(e.target).val(), 24, 75);
             });
 
             $('.slider').on({
                 slide: function () {
-                    app.armMoving = true;
+                    record.armMoving = true;
                     console.log('moving');
                     $('.arm').css('-webkit-animation', 'none');
                     $('.arm').css('-webkit-transform', 'rotate(-' + $('.slider').val() + 'deg)');
@@ -245,7 +280,7 @@ var App = function ($) {
                 //Load the track
                 SC.stream('/tracks/' + this.getCurrentTrack().id, {
                     whileplaying: function () {
-                        if (!app.armMoving && soundObject.loaded) {
+                        if (!record.armMoving && soundObject.loaded) {
                             this.onPosition();
                         }
                     }.bind(this),
@@ -260,7 +295,7 @@ var App = function ($) {
                             soundObject.setPosition(position);
                         },
                         onfinish: function () {
-                            app.next();
+                            record.next();
                         }
                     });
                 }.bind(this));
@@ -293,14 +328,5 @@ var App = function ($) {
 };
 
 app = new App(jQuery);
-
-SC.whenStreamingReady(function () {
-    setTimeout(function () {
-        SC.get('/playlists/2373914', function (playlist) {
-            app.setTracks(playlist.tracks);
-            app.prepare();
-            //console.log(playlist);
-        }.bind(this));
-    }.bind(this), 2200);
-
-});
+record = new Record(jQuery);
+app.load('audio');

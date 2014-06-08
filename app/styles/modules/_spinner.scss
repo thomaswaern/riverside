@@ -1,7 +1,32 @@
 .spinner{
 	overflow:hidden;
 	height:100%;
+	position:relative;
 }
+
+$base-width:100% * 1.4;
+
+/* ul.records{
+	position:absolute;
+	right:0;
+	left:0;
+	bottom:0;
+	background:black;
+	width:100%;
+	height:100px;
+
+
+	li{
+		display:block;
+		height:130px;
+		width:130px;
+		border-radius:3px;
+		margin-left:20px;
+		margin-bottom:20px;
+		background:black;
+		float:left;
+	}
+} */
 
 .record{
 	background:#121113;
@@ -9,23 +34,24 @@
 	background-size:100%;
 	border-radius:50%;
 	border:4px solid #000;
-	width:$width;
+	width:$base-width;
 	height:0;
 	position: absolute;
-	left:$left;
-	top:$top;
-	padding-bottom:$width;
-	margin-bottom: -9999px;
+	margin-left:-$base-width/2;
+	margin-top:-$base-width/2;
+	padding-bottom:$base-width;
 
 	label{
 		background:url('../images/label.gif') no-repeat center center;
 		background-size:100%;
 		display:block;
-		@include center(30%);
-		height:30%;
+		@include center(35%);
+		height:0;
+		padding-bottom:35%;
 		border-radius:50%;
 		text-align:center;
 		font-family: 'Rye', cursive;
+		line-height:1;
 
 		.artist{
 			position: absolute;
@@ -34,18 +60,39 @@
 			margin-left:-25%;
 			width:50%;
 			color:#d9dada;
+			font-size:9px !important;
 		}
 
 		.title{
 			position: absolute;
-			top:58%;
+			top:56%;
 			left:50%;
 			margin-left:-25%;
 			width:50%;
-
+			font-size:6px !important;
 		}
 	}
 
+}
+
+
+.record_spec{
+	background:#121113;
+	background:url('../images/disc.gif')no-repeat center center;
+	background-size:100%;
+	border-radius:50%;
+	border:4px solid #000;
+	width:$base-width;
+	height:0;
+	margin-left:-70%;
+	position: absolute;
+	padding-bottom:$base-width;
+	left:0;
+	//top:-50%;
+	margin-top:-70%;
+	opacity:.4;
+	-webkit-box-shadow: 1px 1px 1px 1px #000;
+	box-shadow: 1px 1px 1px 1px #000;
 }
 
 .hole{
@@ -56,56 +103,57 @@
 }
 
 
-.kitten{
-	border:10px 10px 30px solid white;
-	position: absolute;
-	top:60%;
-	left:60%;
-	z-index: 9999;
+
+.arm-container{
+
+	.arm{
+		width:$base-width * 0.42857142857;
+		height:0;
+		padding-bottom:100%;
+		background: url('../images/arm.png') no-repeat center center;
+		background-size:contain;
+		position: absolute;
+		left: 0;
+		margin-top:-35%;
+		margin-left:-$base-width * 0.28571428571;
+		-webkit-transform-origin:100% -10%;
+		-webkit-transform: rotate($arm_end_pos);
+	}
 }
-
-.arm{
-	width:600px;
-	height:600px;
-	background: url('../images/arm.png') no-repeat center center;
-	background-size:100%;
-	position: absolute;
-	left:-260px;
-	top:-210px;
-	-webkit-transform-origin:100% -200px;
-	-webkit-transform: rotate($arm_end_pos);
-
-}
-
 
 .slider{
+
 	position: absolute;
-	top:210px;
-	left:220px;
-	width:580px;
+	top:0;
+	left:$base-width * 0.07142857142;
+	margin-top:23%;
+	width:$base-width * 0.45;
 	-webkit-transform: rotate(-8deg);
 
 	&.noUi-background{
 		background: none;
 		border:0;
 		box-shadow:none;
+		opacity:0;
 	}
 
 	.noUi-handle{
-		width:100px;
-		height:100px;
+		width:150px;
+		height:150px;
 		border-radius:50%;
 		padding:0;
-		left:-40px;
-		top:-37px;
+		left:-55px;
+		top:-55px;
 		border:0;
 		opacity:0;
 		cursor:ew-resize;
-		background:red;
-		border:0;
+		background:#fd432e;
+		border:0 !important;
 		&::before,&::after{
 			display:none;
 		}
+
+
 
 	}
 }
@@ -116,26 +164,8 @@ button.play{
 	position: absolute;
 	right:10px;
 	top:10px;
-	widht:100px;
+	width:100px;
 	height:100px;
 	background: white;
 	border:0;
-}
-
-.record_spec{
-	background:#121113;
-	background:url('../images/disc.gif')no-repeat center center;
-	background-size:100%;
-	border-radius:50%;
-	border:4px solid #000;
-	width:$width;
-	height:0;
-	position: absolute;
-	left:$left;
-	top:$top;
-	padding-bottom:$width;
-	margin-bottom: -9999px;
-	opacity:.4;
-	-webkit-box-shadow: 1px 1px 1px 1px #000;
-	box-shadow: 1px 1px 1px 1px #000;
 }
