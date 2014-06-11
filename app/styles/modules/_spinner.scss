@@ -134,7 +134,7 @@ $base-width:100% * 1.4;
 		background: none;
 		border:0;
 		box-shadow:none;
-		opacity:0;
+		opacity:1;
 	}
 
 	.noUi-handle{
@@ -147,13 +147,16 @@ $base-width:100% * 1.4;
 		border:0;
 		opacity:0;
 		cursor:ew-resize;
-		background:#fd432e;
+		background:#ff0000;
 		border:0 !important;
+
 		&::before,&::after{
 			display:none;
 		}
 
-
+		@media screen and (min-width:800px){
+            opacity:0.6;
+        }
 
 	}
 }
