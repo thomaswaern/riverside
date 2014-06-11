@@ -145,7 +145,7 @@ $base-width:100% * 1.4;
 		left:-55px;
 		top:-55px;
 		border:0;
-		opacity:0;
+		opacity:0.6;
 		cursor:ew-resize;
 		background:#ff0000;
 		border:0 !important;
@@ -155,7 +155,7 @@ $base-width:100% * 1.4;
 		}
 
 		@media screen and (min-width:800px){
-            opacity:0.6;
+            opacity:0;
         }
 
 	}
