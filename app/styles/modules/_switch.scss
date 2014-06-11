@@ -1,6 +1,6 @@
 .switch{
 	color:white;
-	background:#888;
+	background:rgba(#666,0.4);
 	border:0;
 	position: fixed;
 	right:100px;
@@ -8,9 +8,7 @@
 	height:80px;
 	width:24px;
 	border-radius:30px;
-	-moz-box-shadow:    inset -1px 2px 2px #000000;
-   	-webkit-box-shadow: inset -1px 2px 2px #000000;
-   	box-shadow:         inset -1px 2px 2px #000000;
+   	box-shadow:         inset -1px 2px 8px #333;
    	padding-bottom:28px;
 
    	.noUi-handle{
@@ -39,6 +37,7 @@
 		left:30px;
 		text-decoration:none;
 		font-weight:bold;
+		text-shadow:1px 1px #999;
 	}
 
 

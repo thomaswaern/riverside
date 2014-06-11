@@ -80,49 +80,43 @@ nav{
     background:white;
 }
 
-#wrapper{
-    height:100%;
-}
-
+    #wrapper{
+        height:100%;
+    }
 
     .phone{
+        height:100%;
+        display:flex;
 
         .ring{
-            width:400px;
-            height:400px;
-            margin: auto;
-            position:absolute;
-            top:50%;
-            left:50%;
-            margin:-200px 0 0 -200px;
-            background: transparent url(../images/phonering.png);
+
+            background: transparent url(../images/phonering.png) no-repeat;
             background-size:contain;
             background-position: center center;
+            margin:auto;
+            width:300px;
+            height:0;
+            padding-bottom:50%;
+
+            .stopper{
+                background: transparent url(../images/stopper.png);
+                background-size:contain;
+                background-position: center center;
+            }
         }
 
-        .stopper{
-            position:absolute;
-            bottom:406px;
-            right:567px;
-            background: transparent url(../images/stopper.png);
-            background-size:contain;
-            background-position: center center;
-        }
     }
 
     .tv{
 
         width:100%;
-        height:100%;
+        display:flex;
 
         .frame{
-            width:80%;
+            width:67%;
             height:0;
             padding-bottom:50%;
-            background: transparent url(../images/tv2_low.png);
-            background-size:contain;
-            background-position:center center;
-            background-repeat: no-repeat;
+
             z-index:8;
             position: relative;
             margin:0 auto;
@@ -130,15 +124,15 @@ nav{
 
             ul.channels{
                 margin: 0;
-                width: 22%;
+                width: 18%;
                 padding: 0;
                 height: 5%;
                 position: absolute;
-                left: 71%;
+                left: 67%;
                 opacity: 0.5;
                 list-style: none;
                 padding-left: 0;
-                bottom: 16%;
+                bottom: 28.1%;
 
                 >li{
                     margin-right: 0.9%;
@@ -197,28 +191,43 @@ nav{
             }
         }
 
+        .cover{
+            background: transparent url(../images/tv2_low3.png);
+            background-size:contain;
+            background-position:center center;
+            background-repeat: no-repeat;
+            overflow:hidden;
+            position:absolute;
+            width: 100%;
+            height: 0;
+            left: 0;
+            margin-top: 10.3%;
+            margin-left: 0;
+            padding-bottom: 50%;
+        }
+
         #player{
             background: transparent url(../images/noise.gif) no-repeat;
             background-size:cover;
-            width:50%;
-            height:0;
-            left:50%;
             top:0;
-            margin-top:6.3%;
-            margin-left:-35%;
-            padding-bottom:40%;
             overflow:hidden;
             position:absolute;
+            width: 50%;
+            height: 0;
+            left: 13%;
+            margin-top: 15%;
+
+            padding-bottom: 40%;
 
             & iframe,
             & object,
             & embed {
-                position: absolute;
+                /* position: absolute;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
-                opacity:0;
+                opacity:0; */
             }
         }
     }

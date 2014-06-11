@@ -21,7 +21,8 @@ $(function () {
             case 'video':
                 record.stopAllSounds();
                 //$('.slider').val(24, true);
-                callback = function(){console.log('tv prepare')};
+                console.log();
+                callback = television.prepare;
                 break;
 
             case 'contact':
@@ -57,6 +58,8 @@ var App = function ($) {
         },
 
         load : function(part, callback){
+
+            console.log(part, callback);
 
             //this._currentPage(part);
             app._initMethod = callback;
@@ -108,7 +111,7 @@ var Television = function ($) {
     }
 
     function stopVideo() {
-        this.player.stopVideo();
+        //this.player.stopVideo();
     }
 
     var onPlayerReady = function(event) {
@@ -116,8 +119,7 @@ var Television = function ($) {
     }
 
     return{
-
-        stop : this.stopVideo
+        prepare : onYouTubeIframeAPIReady
     }
 
 }
