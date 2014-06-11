@@ -473,6 +473,12 @@ $(document).ready(function(){
 
 });
 
+window.addEventListener("load",function() {
+    setTimeout(function() {
+        window.scrollTo(0, 1);
+    }, 0);
+});
+
 app = new App(jQuery);
 record = new Record(jQuery);
 television = new Television(jQuery);
