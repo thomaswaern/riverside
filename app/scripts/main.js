@@ -102,7 +102,7 @@ var App = function ($) {
 var Television = function ($) {
 
     var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
+    tag.src = 'https://www.youtube.com/iframe_api';
 
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
@@ -137,7 +137,7 @@ var Television = function ($) {
 
                 start: 100,
                 direction:'rtl',
-                orientation: "vertical",
+                orientation: 'vertical',
                 handles: 1,
                 range: {
                     'min': 0,
@@ -163,36 +163,36 @@ var Television = function ($) {
 
 
         });
-    }
+    };
 
     var onYouTubeIframeAPIReady = function() {
         player = new YT.Player('iframe', {
-          height: '390',
-          width: '640',
-          volume:100,
-          videoId: '-6phZtbBFRk',
-          events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
-          }
+            height: '390',
+            width: '640',
+            volume:100,
+            videoId: '-6phZtbBFRk',
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
         });
 
         prepare();
 
-    }
+    };
 
     var onPlayerStateChange = function(event) {
 
-        if (event.data == YT.PlayerState.PLAYING && !done) {
-          setTimeout(stopVideo, 6000);
-          done = true;
+        if (event.data === YT.PlayerState.PLAYING && !done) {
+            setTimeout(stopVideo, 6000);
+            done = true;
         }
 
         if(done){
             $('#player iframe').css('opacity', 1);
         }
 
-    }
+    };
 
     function stopVideo() {
         //this.player.stopVideo();
@@ -201,20 +201,20 @@ var Television = function ($) {
     var onPlayerReady = function(event) {
         event.target.playVideo();
         $('#player iframe').css('opacity', 1);
-    }
+    };
 
     var loadVideo = function(id){
         $('#player iframe').css('opacity', 0.3);
-        setTimeout(function() {player.loadVideoById(id, 5, "large");}, 500);
-    }
+        setTimeout(function() {player.loadVideoById(id, 5, 'large');}, 500);
+    };
 
     var setVolume = function(vol){
         player.setVolume(vol);
-    }
+    };
 
     var setBrightness = function(val){
         $('#player iframe').css('opacity', val/100);
-    }
+    };
 
     return{
         prepare : onYouTubeIframeAPIReady,
@@ -222,9 +222,9 @@ var Television = function ($) {
         volume:setVolume,
         brightness : setBrightness
 
-    }
+    };
 
-}
+};
 
 var Record = function ($) {
 
