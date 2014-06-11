@@ -13,22 +13,22 @@ $(function () {
 
             case 'audio':
                 if(app.currentPage !== 'audio'){
-                    record.playSoundEffect('end', true);
+                    app.playSoundEffect('end', true);
                 }
                 callback = record.prepare;
                 break;
 
             case 'video':
-                record.stopAllSounds();
+                record.stop();
                 //$('.slider').val(24, true);
-                console.log();
+                
                 callback = television.prepare;
                 break;
 
             case 'contact':
-                record.stopAllSounds();
+                record.stop();
                 //$('.slider').val(24, true);
-                callback = function(){console.log('contact prepare')};
+                callback = function(){};
                 break;
 
         }
@@ -46,7 +46,27 @@ var App = function ($) {
 
     var _currentPage = 'audio';
 
+    var soundEffects = {
+        crackling: new Audio('../sounds/needle.ogg'),
+        end: new Audio('../sounds/endloop.ogg'),
+        channel: new Audio('../sounds/btn.ogg')
+    };
+
     return{
+
+        playSoundEffect: function (key, loop) {
+            //soundEffects[key].stop();
+            soundEffects[key].loop = loop;
+            soundEffects[key].play();
+        },
+
+        stopAllSounds: function () {
+
+            for (var key in soundEffects) {
+                soundEffects[key].pause();
+            }
+
+        },
 
         getCurrentPage: function () {
             return this._currentPage;
@@ -59,7 +79,6 @@ var App = function ($) {
 
         load : function(part, callback){
 
-            console.log(part, callback);
 
             //this._currentPage(part);
             app._initMethod = callback;
@@ -91,23 +110,88 @@ var Television = function ($) {
     var player;
     var done = false;
 
+    var prepare = function(){
+
+
+        $('ul.channels li').on('click', function(e){
+
+            var $target = $(e.target).closest('li'),
+                $link = $target.find('a');
+
+            if($target.find('a').data('id')){
+                loadVideo($link.data('id'));
+                app.playSoundEffect('channel',false);
+                $target.siblings().find('a').removeClass('active');
+                $link.addClass('active');
+            }
+
+            e.preventDefault();
+
+        });
+
+        $('.sliders div').each(function(index,el){
+
+            $(el).css('height', $('.sliders').outerHeight());
+
+            $(el).noUiSlider({
+
+                start: 100,
+                direction:'rtl',
+                orientation: "vertical",
+                handles: 1,
+                range: {
+                    'min': 0,
+                    'max': 100
+                }
+
+            }).on({
+                slide: function (e) {
+
+                    if(typeof(television[$(e.target).data('control')]) === 'function'){
+                        television[$(e.target).data('control')]($(this).val());
+                        
+                    }
+
+                },
+                set: function (e) {
+                    if(typeof(television[$(e.target).data('control')]) === 'function'){
+                        television[$(e.target).data('control')]($(this).val());
+                        
+                    }
+                }
+            });
+
+
+        });
+    }
+
     var onYouTubeIframeAPIReady = function() {
-        player = new YT.Player('player', {
+        player = new YT.Player('iframe', {
           height: '390',
           width: '640',
-          videoId: '1zDvDKufc80',
+          volume:100,
+          videoId: '-6phZtbBFRk',
           events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange
           }
         });
+
+        prepare();
+
     }
 
     var onPlayerStateChange = function(event) {
+
         if (event.data == YT.PlayerState.PLAYING && !done) {
           setTimeout(stopVideo, 6000);
           done = true;
         }
+
+        if(done){
+            $('#player iframe').css('opacity', 1);
+        }
+
     }
 
     function stopVideo() {
@@ -116,20 +200,33 @@ var Television = function ($) {
 
     var onPlayerReady = function(event) {
         event.target.playVideo();
+        $('#player iframe').css('opacity', 1);
+    }
+
+    var loadVideo = function(id){
+        $('#player iframe').css('opacity', 0.3);
+        setTimeout(function() {player.loadVideoById(id, 5, "large");}, 500);
+    }
+
+    var setVolume = function(vol){
+        player.setVolume(vol);
+    }
+
+    var setBrightness = function(val){
+        $('#player iframe').css('opacity', val/100);
     }
 
     return{
-        prepare : onYouTubeIframeAPIReady
+        prepare : onYouTubeIframeAPIReady,
+        load : loadVideo,
+        volume:setVolume,
+        brightness : setBrightness
+
     }
 
 }
 
 var Record = function ($) {
-
-    var soundEffects = {
-        crackling: new Audio('../sounds/needle.ogg'),
-        end: new Audio('../sounds/endloop.ogg')
-    };
 
     var tracks = [];
 
@@ -198,7 +295,7 @@ var Record = function ($) {
 
         prepare: function () {
 
-            console.log('preparing sliders');
+            
 
             SC.whenStreamingReady(function () {
                 setTimeout(function () {
@@ -224,7 +321,7 @@ var Record = function ($) {
             });
 
             $('.slider').change(function (e) {
-                console.log('change');
+                
                 record.armMoving = false;
                 record.setPosition($(e.target).val(), 24, 75);
             });
@@ -232,13 +329,13 @@ var Record = function ($) {
             $('.slider').on({
                 slide: function () {
                     record.armMoving = true;
-                    console.log('moving');
+                    
                     $('.arm').css('-webkit-animation', 'none');
                     $('.arm').css('-webkit-transform', 'rotate(-' + $('.slider').val() + 'deg)');
                     $('.slider').css('-webkit-transform', 'rotate(-' + $('.slider').val() / 3 + 'deg)');
                 },
                 set: function () {
-                    console.log('set');
+                    
                     $('.arm').css('-webkit-transform', 'rotate(-' + $('.slider').val() + 'deg)');
                 }
             });
@@ -253,7 +350,7 @@ var Record = function ($) {
             //.css('display','block')
             //.css('-webkit-animation', 'initarm 2s linear 1');
             //
-            record.playSoundEffect('end', true);
+            app.playSoundEffect('end', true);
 
         },
 
@@ -337,7 +434,7 @@ var Record = function ($) {
                     autoLoad: true
                 }, function (sound) {
                     soundObject = sound;
-                    this.playSoundEffect('crackling', false);
+                    app.playSoundEffect('crackling', false);
                     soundObject.setVolume(0);
                     soundObject.play({
                         onload: function () {
@@ -353,17 +450,7 @@ var Record = function ($) {
 
         },
 
-        playSoundEffect: function (key, loop) {
-            //soundEffects[key].stop();
-            soundEffects[key].loop = loop;
-            soundEffects[key].play();
-        },
-
-        stopAllSounds: function () {
-
-            for (var key in soundEffects) {
-                soundEffects[key].pause();
-            }
+        stop: function () {
 
             //Stop current sound if any
             try {
@@ -376,6 +463,15 @@ var Record = function ($) {
 
     };
 };
+
+$(document).ready(function(){
+
+    
+
+    
+
+
+});
 
 app = new App(jQuery);
 record = new Record(jQuery);
