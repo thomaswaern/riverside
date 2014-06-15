@@ -1,46 +1,21 @@
 'use strict';
 
-var app, record, television;
+var app, record, television, contact;
 
 $(function () {
 
     $('a[href*=#]:not([href=#])').on('click',function () {
 
         var target = this.hash.slice(1);
-        var callback;
 
-        switch(target){
-
-            case 'audio':
-                if(app.currentPage !== 'audio'){
-                    app.playSoundEffect('end', true);
-                }
-                callback = record.prepare;
-                break;
-
-            case 'video':
-                record.stop();
-                //$('.slider').val(24, true);
-                
-                callback = television.prepare;
-                break;
-
-            case 'contact':
-                record.stop();
-                //$('.slider').val(24, true);
-                callback = function(){};
-                break;
-
-        }
-
-        app.load(target, callback);
-
+        app.getAndLoad(target);
 
     });
 
-    //Draggable.create('.ring', {type: 'rotation', throwProps: true});
 
 });
+
+
 
 var App = function ($) {
 
@@ -49,15 +24,60 @@ var App = function ($) {
     var soundEffects = {
         crackling: new Audio('../sounds/needle.ogg'),
         end: new Audio('../sounds/endloop.ogg'),
-        channel: new Audio('../sounds/btn.ogg')
+        channel: new Audio('../sounds/btn.ogg'),
+        dial: new Audio('../sounds/dial_short.ogg'),
+        dialBack: new Audio('../sounds/dialback.ogg'),
+        dialEnd: new Audio('../sounds/dialend.ogg'),
+        tv: new Audio('../sounds/tv.ogg')
     };
 
+    var pages = [
+        'audio',
+        'video',
+        'contact'
+    ]
+
     return{
+
+        getAndLoad : function(target){
+
+            var callback;
+
+            app.stopAllSounds();
+
+            switch(target){
+
+                case 'audio':
+                    if(app.currentPage !== 'audio'){
+                        app.playSoundEffect('end', true);
+                    }
+                    callback = record.prepare;
+                    break;
+
+                case 'video':
+                    record.stop();
+                    //$('.slider').val(24, true);
+
+                    callback = television.prepare;
+                    break;
+
+                case 'contact':
+                    record.stop();
+                    //$('.slider').val(24, true);
+                    callback = contact.prepare;
+                    break;
+
+            }
+
+            app.load(target, callback);
+        },
 
         playSoundEffect: function (key, loop) {
             //soundEffects[key].stop();
             soundEffects[key].loop = loop;
             soundEffects[key].play();
+
+            return soundEffects[key];
         },
 
         stopAllSounds: function () {
@@ -65,7 +85,38 @@ var App = function ($) {
             for (var key in soundEffects) {
                 soundEffects[key].pause();
             }
+        },
 
+        sound : function(key){
+            return soundEffects[key];
+        },
+
+        prepare : function(){
+
+            $('.switch > div').noUiSlider({
+
+                start: 0,
+                orientation: 'vertical',
+                handles: 1,
+                step:1,
+                behaviour: 'extend-tap',
+                range: {
+                    'min': 0,
+                    'max': 2
+                }
+
+            }).on({
+                slide: function (e) {
+                    var index = parseInt(Math.floor($(this).val()));
+                    app.getAndLoad(pages[index]);
+
+                },
+                set: function (e) {
+                    if(typeof(television[$(e.target).data('control')]) === 'function'){
+                        television[$(e.target).data('control')]($(this).val());
+                    }
+                }
+            });
         },
 
         getCurrentPage: function () {
@@ -77,10 +128,12 @@ var App = function ($) {
             f();
         },
 
+        setSwitch : function(index){
+            $('.switch > div').val(index);
+        },
+
         load : function(part, callback){
 
-
-            //this._currentPage(part);
             app._initMethod = callback;
 
             $.ajax({
@@ -92,12 +145,131 @@ var App = function ($) {
 
                     $('#wrapper').html(results);
 
+                    app.setSwitch(pages.indexOf(part));
+
                     app.init(callback);
                 }
             });
         }
     };
 };
+
+var Contact = function ($) {
+
+    var maxrot,
+        instance,
+        numberToCall = '',
+        currentItem;
+
+    var getAngle = function(deltaX,deltaY){
+        console.log
+        var deg = Math.tan(deltaX/deltaY);
+        deg *= 57.2957795;
+
+        return deg;
+    }
+
+    var doCall = function(){
+        var msg = new SpeechSynthesisUtterance();
+        var voices = window.speechSynthesis.getVoices();
+        console.log(voices);
+        msg.voice = voices[0]; // Note: some voices don't support altering params
+        msg.voiceURI = 'native';
+        msg.volume = 1; // 0 to 1
+        msg.rate = 0.1; // 0.1 to 10
+        msg.pitch = 0; //0 to 2
+        msg.text = 'Riverside Society speaking.';
+        msg.lang = 'en-US';
+
+
+        msg.onend = function(e) {
+          console.log('Finished in ' + event.elapsedTime + ' seconds.');
+        };
+
+        speechSynthesis.speak(msg);
+    }
+
+    var saveNumber = function(){
+        numberToCall += currentItem.text();
+        console.log(numberToCall);
+        $('.note').html(numberToCall);
+        if(numberToCall === '666'){
+            contact.instance.disable();
+            doCall();
+        }
+    }
+
+    var setCurrentItem = function(item){
+        currentItem = item;
+    }
+
+    return{
+
+        prepare : function(){
+
+            var self = this;
+            numberToCall = '';
+
+            Draggable.create('.ring', {
+                type: 'rotation',
+                trigger:'.ring .links',
+                dragResistance:0.0,
+                bounds:{
+                    minRotation:0,
+                    maxRotation:0
+                },
+                throwProps: false,
+                onPress : function(e){
+
+                    contact.instance = this;
+
+                    if(e.target.nodeName !== 'LI'){
+                        maxrot = 0;
+                    }else{
+                        maxrot = ($(e.target).index())*29 + 50;
+                        setCurrentItem($(e.target));
+                    }
+
+                    this.applyBounds({
+                        minRotation:0,
+                        maxRotation:maxrot
+                    });
+                },
+                onDrag : function(e){
+                    if(this.rotation > 10){
+                        app.playSoundEffect('dial',false);
+                    }
+
+                    if(this.rotation === this.maxRotation){
+                        contact.instance.disable();
+                        //currentItem.addClass('current').siblings().removeClass('current');
+                        saveNumber();
+                    }
+                },
+
+                onDragEnd:function(e) {
+                    //console.log('ondragend', this.target);
+
+                    contact.instance.disable();
+
+                    var $target = $(e.target).closest('.ring');
+
+                    app.stopAllSounds();
+                    app.playSoundEffect('dialBack',false);
+
+                    TweenMax.to($target, maxrot/400, {rotation:0, onComplete:function(){
+                        app.playSoundEffect('dialEnd',false);
+                        contact.instance.enable();
+                    }});
+
+
+
+                }
+            });
+        }
+    };
+
+}
 
 var Television = function ($) {
 
@@ -112,6 +284,9 @@ var Television = function ($) {
 
     var prepare = function(){
 
+
+        app.playSoundEffect('tv',true);
+        app.sound('tv').volume = 0;
 
         $('ul.channels li').on('click', function(e){
 
@@ -149,14 +324,12 @@ var Television = function ($) {
 
                     if(typeof(television[$(e.target).data('control')]) === 'function'){
                         television[$(e.target).data('control')]($(this).val());
-                        
                     }
 
                 },
                 set: function (e) {
                     if(typeof(television[$(e.target).data('control')]) === 'function'){
                         television[$(e.target).data('control')]($(this).val());
-                        
                     }
                 }
             });
@@ -190,6 +363,7 @@ var Television = function ($) {
 
         if(done){
             $('#player iframe').css('opacity', 1);
+            app.sound('tv').volume = 0;
         }
 
     };
@@ -201,10 +375,12 @@ var Television = function ($) {
     var onPlayerReady = function(event) {
         event.target.playVideo();
         $('#player iframe').css('opacity', 1);
+        
     };
 
     var loadVideo = function(id){
         $('#player iframe').css('opacity', 0.3);
+        app.sound('tv').volume = 0.4;
         setTimeout(function() {player.loadVideoById(id, 5, 'large');}, 500);
     };
 
@@ -214,13 +390,20 @@ var Television = function ($) {
 
     var setBrightness = function(val){
         $('#player iframe').css('opacity', val/100);
+        app.sound('tv').volume = 1 - (val/100);
+
     };
+
+    var setSaturation = function(val){
+        //$('#player iframe').css('opacity', 'saturate(val+'%'));
+    }
 
     return{
         prepare : onYouTubeIframeAPIReady,
         load : loadVideo,
         volume:setVolume,
-        brightness : setBrightness
+        brightness : setBrightness,
+        saturation : setSaturation
 
     };
 
@@ -295,8 +478,6 @@ var Record = function ($) {
 
         prepare: function () {
 
-            
-
             SC.whenStreamingReady(function () {
                 setTimeout(function () {
                     SC.get('/playlists/2373914', function (playlist) {
@@ -321,7 +502,6 @@ var Record = function ($) {
             });
 
             $('.slider').change(function (e) {
-                
                 record.armMoving = false;
                 record.setPosition($(e.target).val(), 24, 75);
             });
@@ -329,13 +509,13 @@ var Record = function ($) {
             $('.slider').on({
                 slide: function () {
                     record.armMoving = true;
-                    
+
                     $('.arm').css('-webkit-animation', 'none');
                     $('.arm').css('-webkit-transform', 'rotate(-' + $('.slider').val() + 'deg)');
                     $('.slider').css('-webkit-transform', 'rotate(-' + $('.slider').val() / 3 + 'deg)');
                 },
                 set: function () {
-                    
+
                     $('.arm').css('-webkit-transform', 'rotate(-' + $('.slider').val() + 'deg)');
                 }
             });
@@ -465,12 +645,7 @@ var Record = function ($) {
 };
 
 $(document).ready(function(){
-
-    
-
-    
-
-
+    app.prepare();
 });
 
 window.addEventListener("load",function() {
@@ -482,4 +657,5 @@ window.addEventListener("load",function() {
 app = new App(jQuery);
 record = new Record(jQuery);
 television = new Television(jQuery);
+contact = new Contact(jQuery);
 app.load('audio', record.prepare);

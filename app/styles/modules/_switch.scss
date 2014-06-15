@@ -3,20 +3,32 @@
 	background:rgba(#666,0.4);
 	border:0;
 	position: fixed;
-	right:100px;
-	bottom:50px;
+	right:20px;
+	bottom:20px;
 	height:80px;
 	width:24px;
 	border-radius:30px;
    	box-shadow:         inset -1px 2px 8px #333;
    	padding-bottom:28px;
 
+   	.noUi-target{
+   		border:0;
+   		box-shadow:none;
+   		height:100px;
+   		background:0;
+   		border:0;
+   	}
+
+   	.noUi-vertical.noUi-extended {
+		padding: 10px 0;
+	}
+
    	.noUi-handle{
 		width:18px;
 		height:18px;
 		border-radius:50%;
 		background:#ccc;
-		top:6px;
+		top:-6px;
 		left:2px;
 		cursor:ns-resize;
 		-moz-box-shadow:    inset -1px 2px 2px #aaa, -1px 2px 2px #444;
@@ -34,7 +46,7 @@
 		font-size:11px;
 		color:#444;
 		position: absolute;
-		left:30px;
+		right:30px;
 		text-decoration:none;
 		font-weight:bold;
 		text-shadow:1px 1px #999;
