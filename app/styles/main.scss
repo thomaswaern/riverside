@@ -1,8 +1,6 @@
 // bower:scss
 // endbower
 
-
-
 /* $top : - ($width/2);
 $left: - ($width/2); */
 
@@ -45,6 +43,7 @@ $arm_end_pos : -24deg;
 
 @import "modules/spinner";
 @import "modules/switch";
+@import "modules/icons";
 
 body,html{
     height:100%;
@@ -87,32 +86,63 @@ nav{
 
     #wrapper{
         height:100%;
+        user-select: none;
     }
 
     #contact{
         .note{
-            background:white;
-            height:30px;
-            width:300px;
+
             position:absolute;
-            color:red;
-            left:30px;
-            top:30px;
-            line-height:30px;
-            font-family: 'Rye', cursive;
+            width:130px;
+            height:20px;
+            margin-top:15px;
+            overflow:hidden;
+            margin-left:40px;
+            position:absolute;
+            color:#403616;
+            text-shadow:0 0 1px #645633;
+            padding: 0;
+            top: 50%;
+            left: 50%;
+            font-size:14px;
+            text-align: center;
+            margin-left: -65px;
+            //pointer-events: none;
+
         }
+        .stopper{
+                background: transparent url(../images/stopper.png) no-repeat;
+                background-size:contain;
+                background-position: center center;
+                width:80px;
+                height:80px;
+                margin-top:50px;
+                margin-left:40px;
+                position:absolute;
+                top:50%;
+                left:50%;
+                pointer-events: none;
+            }
     }
 
     .phone{
 
         height:100%;
         display:flex;
-        background: transparent url(../images/phonering.png) no-repeat;
-                    background-size:300px 300px;
-                    background-position: center center;
-                    justify-content:center;
+        background: transparent url(../images/phonering_label.png) no-repeat;
+        background-size:300px 300px;
+        background-position: center center;
+        justify-content:center;
 
         .ring{
+
+            &.active{
+                ul{
+                    li{
+                        a{pointer-events:auto;}
+                    }
+                }
+            }
 
             margin:auto;
             width:100%;
@@ -132,6 +162,7 @@ nav{
                 background-position: center center;
                 list-style:none;
                 position:relative;
+                user-select: none;
 
                 li{
                     position:absolute;
@@ -143,9 +174,16 @@ nav{
                     cursor:pointer;
                     line-height:45px;
                     font-family: 'Rye', cursive;
-                    font-weight:bold;
+                    font-weight:normal;
                     font-size:1.5em;
                     color:#333;
+                    user-select: none;
+
+                    a{
+                        pointer-events:none;
+                        text-decoration:none;
+                        color:#333;
+                    }
 
                     &.current{
                         background:rgba(lime,0.2);
@@ -193,32 +231,32 @@ nav{
                     }
 
                     &:nth-child(7){
-                        color:yellow;
+                        right:241px;
+                        top:0;
+                        margin-top:138px;
                     }
 
                     &:nth-child(8n){
-                        color:gray;
+                        right:221px;
+                        top:0;
+                        margin-top:192px;
                     }
 
                     &:nth-child(9n){
-                        color:pink;
+                        right:180px;
+                        top:0;
+                        margin-top:227px;
                     }
 
                     &:nth-child(10n){
-                        color:blue;
+                        right:126px;
+                        top:0;
+                        margin-top:243px;
                     }
                 }
             }
 
-            .stopper{
-                background: transparent url(../images/stopper.png) no-repeat;
-                background-size:contain;
-                background-position: center center;
-                width:80px;
-                height:80px;
-                bottom:0;
-                right:0;
-            }
+            
         }
 
     }
@@ -232,7 +270,7 @@ nav{
 
         .frame{
             width:700px;
-            height:400px;
+            height:480px;
             z-index:8;
             position: relative;
             margin:auto;

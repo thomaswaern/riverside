@@ -28,7 +28,10 @@ var App = function ($) {
         dial: new Audio('../sounds/dial_short.ogg'),
         dialBack: new Audio('../sounds/dialback.ogg'),
         dialEnd: new Audio('../sounds/dialend.ogg'),
-        tv: new Audio('../sounds/tv.ogg')
+        tv: new Audio('../sounds/tv.ogg'),
+        wrongnumber: new Audio('../sounds/wrongnumber.ogg'),
+        dialtone: new Audio('../sounds/dialtone.ogg'),
+        answer: new Audio('../sounds/answer.ogg')
     };
 
     var pages = [
@@ -48,7 +51,7 @@ var App = function ($) {
             switch(target){
 
                 case 'audio':
-                    if(app.currentPage !== 'audio'){
+                    if(app.getCurrentPage() !== 'audio'){
                         app.playSoundEffect('end', true);
                     }
                     callback = record.prepare;
@@ -120,7 +123,7 @@ var App = function ($) {
         },
 
         getCurrentPage: function () {
-            return this._currentPage;
+            return _currentPage;
         },
 
         init : function(callback){
@@ -135,6 +138,8 @@ var App = function ($) {
         load : function(part, callback){
 
             app._initMethod = callback;
+
+            _currentPage = part;
 
             $.ajax({
                 context: this,
@@ -159,7 +164,9 @@ var Contact = function ($) {
     var maxrot,
         instance,
         numberToCall = '',
-        currentItem;
+        currentItem,
+        hasAnswered = false,
+        calling = false;
 
     var getAngle = function(deltaX,deltaY){
         console.log
@@ -169,34 +176,73 @@ var Contact = function ($) {
         return deg;
     }
 
+    var links = [
+        ['+46(0)708-138138','tel:0708138138','_self'],
+        ['hey@riverside.com','mailto:hey@riverside.com','_blank'],
+        ['Youtube','http://youtube.com/user/riversidesoc','_blank'],
+        ['Soundcloud','http://soundcloud.com/riverside-society','_blank'],
+        ['Twitter','http://twitter.com/riversidesoc','_blank'],
+        ['Facebook','','_blank'],
+        ['Instagram','http://instagram.com/riversidesociety','_blank']
+    ];
+
+    var answerPhone = function(){
+        calling = false;
+        app.playSoundEffect('answer',false);
+        numberToCall = '';
+        hasAnswered = true;
+        $('.ring').addClass('active');
+        $('.note').html(numberToCall);
+        contact.instance.enable();
+        //$('.ring .links li').addClass('iconized');
+    }
+
     var doCall = function(){
-        var msg = new SpeechSynthesisUtterance();
-        var voices = window.speechSynthesis.getVoices();
-        console.log(voices);
-        msg.voice = voices[0]; // Note: some voices don't support altering params
-        msg.voiceURI = 'native';
-        msg.volume = 1; // 0 to 1
-        msg.rate = 0.1; // 0.1 to 10
-        msg.pitch = 0; //0 to 2
-        msg.text = 'Riverside Society speaking.';
-        msg.lang = 'en-US';
 
+        calling = true;
 
-        msg.onend = function(e) {
-          console.log('Finished in ' + event.elapsedTime + ' seconds.');
-        };
+        contact.instance.disable();
 
-        speechSynthesis.speak(msg);
+        app.playSoundEffect('dialtone', true);
+
+        setTimeout(function() {
+            if(app.getCurrentPage() === 'contact'){
+                app.stopAllSounds();
+                answerPhone();
+            }
+        }, 8000);
+    }
+
+    var getContactLink = function(index){
+
+        var $link = $('<a/>', {
+            'href' : links[index][1],
+            'target' : links[index][2],
+            text : links[index][0]
+        });
+
+        $('.note').html($link);
     }
 
     var saveNumber = function(){
-        numberToCall += currentItem.text();
-        console.log(numberToCall);
-        $('.note').html(numberToCall);
-        if(numberToCall === '666'){
-            contact.instance.disable();
-            doCall();
+
+        if(hasAnswered){
+            return;
         }
+
+        numberToCall += currentItem.text();
+
+        if(numberToCall.length >= 5){
+            if(numberToCall === '67285'){
+                contact.instance.disable();
+                doCall();
+            }else{
+                app.playSoundEffect('wrongnumber', false);
+                numberToCall = '';
+            }
+        }
+
+        $('.note').html(numberToCall);
     }
 
     var setCurrentItem = function(item){
@@ -209,24 +255,29 @@ var Contact = function ($) {
 
             var self = this;
             numberToCall = '';
+            hasAnswered = false;
+            calling = false;
 
             Draggable.create('.ring', {
                 type: 'rotation',
                 trigger:'.ring .links',
-                dragResistance:0.0,
+                dragResistance:0,
                 bounds:{
                     minRotation:0,
                     maxRotation:0
                 },
                 throwProps: false,
+
                 onPress : function(e){
 
+                    console.log('press', e.target);
                     contact.instance = this;
+
 
                     if(e.target.nodeName !== 'LI'){
                         maxrot = 0;
                     }else{
-                        maxrot = ($(e.target).index())*29 + 50;
+                        maxrot = ($(e.target).index())*29 + 55;
                         setCurrentItem($(e.target));
                     }
 
@@ -236,33 +287,48 @@ var Contact = function ($) {
                     });
                 },
                 onDrag : function(e){
+
                     if(this.rotation > 10){
                         app.playSoundEffect('dial',false);
                     }
 
-                    if(this.rotation === this.maxRotation){
+                    if(this.rotation === this.maxRotation && e.type == 'mousemove'){
+
+              /*          if(e.target.nodeName !== 'LI'){
+                            contact.instance.kill();
+                        }*/
+
                         contact.instance.disable();
+
+                        if(hasAnswered){
+                            getContactLink($(e.target).index());
+                        }else{
+                            saveNumber();
+                        }
+
                         //currentItem.addClass('current').siblings().removeClass('current');
-                        saveNumber();
+
                     }
                 },
 
                 onDragEnd:function(e) {
-                    //console.log('ondragend', this.target);
 
-                    contact.instance.disable();
+                    if(e.target.nodeName === 'DIV' || e.target.nodeName === 'UL' || e.target.nodeName === 'LI'){
+                        contact.instance.disable();
 
-                    var $target = $(e.target).closest('.ring');
+                    }else{
+                        this.kill();
+                    }
+
+                    var $target = $('.ring');
 
                     app.stopAllSounds();
                     app.playSoundEffect('dialBack',false);
 
                     TweenMax.to($target, maxrot/400, {rotation:0, onComplete:function(){
                         app.playSoundEffect('dialEnd',false);
-                        contact.instance.enable();
+                        if(!calling){contact.instance.enable()};
                     }});
-
-
 
                 }
             });
@@ -283,7 +349,6 @@ var Television = function ($) {
     var done = false;
 
     var prepare = function(){
-
 
         app.playSoundEffect('tv',true);
         app.sound('tv').volume = 0;
@@ -333,8 +398,6 @@ var Television = function ($) {
                     }
                 }
             });
-
-
         });
     };
 
@@ -476,17 +539,27 @@ var Record = function ($) {
             $('.slider').val(value + 24, true);
         },
 
-        prepare: function () {
-
+        prepare : function(){
             SC.whenStreamingReady(function () {
                 setTimeout(function () {
                     SC.get('/playlists/2373914', function (playlist) {
                         record.setTracks(playlist.tracks);
-                        //console.log(playlist);
+                        if(app.getCurrentPage() === 'audio'){record.init();}
                     }.bind(this));
                 }.bind(this), 2200);
 
-            });
+            }.bind(this));
+
+            //Disable switch while loading
+            $('.switch > div').attr('disabled', 'disabled');
+
+        },
+
+        init: function () {
+
+
+            //Re-eneable switch
+            $('.switch > div').removeAttr('disabled');
 
             //var track = this.setCurrentTrack(0);
 
