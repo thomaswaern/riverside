@@ -292,7 +292,7 @@ var Contact = function ($) {
                         app.playSoundEffect('dial',false);
                     }
 
-                    if(this.rotation === this.maxRotation && e.type == 'mousemove'){
+                    if(this.rotation === this.maxRotation && (e.type === 'mousemove' || e.type === 'touchmove')){
 
               /*          if(e.target.nodeName !== 'LI'){
                             contact.instance.kill();
