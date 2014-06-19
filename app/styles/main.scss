@@ -269,8 +269,8 @@ nav{
         justify-content:center;
 
         .frame{
-            width:700px;
-            height:480px;
+            width:700px * 1.5;
+            height:480px * 1.5;
             z-index:8;
             position: relative;
             margin:auto;
@@ -282,11 +282,11 @@ nav{
 
             ul.channels{
                 margin: 0;
-                width: 18%;
+                width: 17.5%;
                 padding: 0;
                 height: 5%;
                 position: absolute;
-                left: 67%;
+                left: 67.1%;
                 opacity: 0.5;
                 list-style: none;
                 padding-left: 0;
@@ -401,6 +401,7 @@ nav{
             margin-top: 15%;
             padding-bottom: 40%;
 
+        
             & iframe,
             & object,
             & embed {

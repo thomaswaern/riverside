@@ -51,9 +51,7 @@ var App = function ($) {
             switch(target){
 
                 case 'audio':
-                    if(app.getCurrentPage() !== 'audio'){
-                        app.playSoundEffect('end', true);
-                    }
+
                     callback = record.prepare;
                     break;
 
@@ -169,7 +167,7 @@ var Contact = function ($) {
         calling = false;
 
     var getAngle = function(deltaX,deltaY){
-        console.log
+        
         var deg = Math.tan(deltaX/deltaY);
         deg *= 57.2957795;
 
@@ -210,10 +208,12 @@ var Contact = function ($) {
                 app.stopAllSounds();
                 answerPhone();
             }
-        }, 8000);
+        }, Math.random()*10000);
     }
 
-    var getContactLink = function(index){
+    var getContactLink = function(){
+
+        var index = $(currentItem).index();
 
         var $link = $('<a/>', {
             'href' : links[index][1],
@@ -270,9 +270,8 @@ var Contact = function ($) {
 
                 onPress : function(e){
 
-                    console.log('press', e.target);
+                    
                     contact.instance = this;
-
 
                     if(e.target.nodeName !== 'LI'){
                         maxrot = 0;
@@ -294,14 +293,15 @@ var Contact = function ($) {
 
                     if(this.rotation === this.maxRotation && (e.type === 'mousemove' || e.type === 'touchmove')){
 
-              /*          if(e.target.nodeName !== 'LI'){
+                        /*
+                            if(e.target.nodeName !== 'LI'){
                             contact.instance.kill();
                         }*/
 
                         contact.instance.disable();
 
                         if(hasAnswered){
-                            getContactLink($(e.target).index());
+                            getContactLink();
                         }else{
                             saveNumber();
                         }
@@ -346,26 +346,93 @@ var Television = function ($) {
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
     var player;
+    var playlist = [];
     var done = false;
 
+    var init = function(){
+        
+
+
+    };
+
     var prepare = function(){
+
+
 
         app.playSoundEffect('tv',true);
         app.sound('tv').volume = 0;
 
-        $('ul.channels li').on('click', function(e){
+        var playListURL = 'http://gdata.youtube.com/feeds/api/playlists/PL4dadaf1ycyVnQTJ9INfD0jfFF_XDF2cG?v=2&alt=json&callback=?';
+        var videoURL= 'http://www.youtube.com/watch?v=';
+
+        $.getJSON(playListURL, function(data) {
+
+            var list_data="";
+
+            $.each(data.feed.entry, function(i, item) {
+
+                var feedTitle = item.title.$t;
+                var feedURL = item.link[1].href;
+                var fragments = feedURL.split("/");
+                var videoID = fragments[fragments.length - 2];
+                var url = videoURL + videoID;
+                var thumb = "http://img.youtube.com/vi/"+ videoID +"/default.jpg";
+
+                playlist.push(videoID);
+
+                if (videoID !='videos') {
+                    list_data += '<li><a href="" data-id="' + videoID + '"></a></li>';
+                }
+
+            });
+
+            player = new YT.Player('iframe', {
+                height: '390',
+                width: '640',
+                volume:100,
+                videoId: playlist[0],
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+
+
+            $(list_data).appendTo("ul.channels");
+
+            var $channels = $('ul.channels');
+            $channels.find('li:first a').addClass('active');
+            $channels.append('<li style="float:right;"><a href="#" class="onoff"></li>');
+
+        });
+
+
+
+        
+        $('ul.channels').on('click','li', function(e){
+
+            e.preventDefault();
 
             var $target = $(e.target).closest('li'),
-                $link = $target.find('a');
+                $link = $target.find('a'),
+                $channels = $('.channels');
+
 
             if($target.find('a').data('id')){
-                loadVideo($link.data('id'));
+
+                var videoID =$link.data('id');
+
+                loadVideo(videoID);
                 app.playSoundEffect('channel',false);
                 $target.siblings().find('a').removeClass('active');
                 $link.addClass('active');
+            }else{
+                player.stopVideo();
+                $channels.find('a').removeClass('active');
+                $channels.find('li:last a').addClass('active');
             }
 
-            e.preventDefault();
+            
 
         });
 
@@ -399,29 +466,21 @@ var Television = function ($) {
                 }
             });
         });
-    };
 
-    var onYouTubeIframeAPIReady = function() {
-        player = new YT.Player('iframe', {
-            height: '390',
-            width: '640',
-            volume:100,
-            videoId: '-6phZtbBFRk',
-            events: {
-                'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange
-            }
-        });
-
-        prepare();
 
     };
+
 
     var onPlayerStateChange = function(event) {
 
         if (event.data === YT.PlayerState.PLAYING && !done) {
             setTimeout(stopVideo, 6000);
             done = true;
+        }
+
+        if(event.data === YT.PlayerState.ENDED){
+            player.seekTo(0);
+            player.playVideo();
         }
 
         if(done){
@@ -462,7 +521,7 @@ var Television = function ($) {
     }
 
     return{
-        prepare : onYouTubeIframeAPIReady,
+        prepare : prepare,
         load : loadVideo,
         volume:setVolume,
         brightness : setBrightness,
@@ -530,7 +589,6 @@ var Record = function ($) {
         onPosition: function () {
 
             var globalTimestamp = previousTracksLength + soundObject.position;
-
             this.setArmRotation(globalTimestamp / totalTime);
         },
 
@@ -543,6 +601,7 @@ var Record = function ($) {
             SC.whenStreamingReady(function () {
                 setTimeout(function () {
                     SC.get('/playlists/2373914', function (playlist) {
+                        if(playlist.artwork_url){$('.record label').css('background-image', 'url('+playlist.artwork_url+')');}
                         record.setTracks(playlist.tracks);
                         if(app.getCurrentPage() === 'audio'){record.init();}
                     }.bind(this));
@@ -551,7 +610,7 @@ var Record = function ($) {
             }.bind(this));
 
             //Disable switch while loading
-            $('.switch > div').attr('disabled', 'disabled');
+            //$('.switch > div').attr('disabled', 'disabled');
 
         },
 
@@ -559,7 +618,7 @@ var Record = function ($) {
 
 
             //Re-eneable switch
-            $('.switch > div').removeAttr('disabled');
+            //$('.switch > div').removeAttr('disabled');
 
             //var track = this.setCurrentTrack(0);
 

@@ -42,8 +42,10 @@ $base-width:100% * 1.4;
 	padding-bottom:$base-width;
 
 	label{
-		background:url('../images/label.gif') no-repeat center center;
-		background-size:100%;
+		background:url('../images/label.gif');
+		background-size:cover;
+		background-position:center center;
+		background-repeat:no-repeat;
 		display:block;
 		@include center(35%);
 		height:0;
@@ -60,7 +62,8 @@ $base-width:100% * 1.4;
 			margin-left:-25%;
 			width:50%;
 			color:#d9dada;
-			font-size:9px !important;
+			font-size: 2.9vw;
+			display:none;
 		}
 
 		.title{
@@ -69,7 +72,10 @@ $base-width:100% * 1.4;
 			left:50%;
 			margin-left:-25%;
 			width:50%;
-			font-size:6px !important;
+			font-size: 1.2vw;
+			color:white;
+			text-shadow:1px 1px 1px #999;
+			line-height:1.5em;
 		}
 	}
 
@@ -145,9 +151,9 @@ $base-width:100% * 1.4;
 		left:-55px;
 		top:-55px;
 		border:0;
-		opacity:0.6;
+		opacity:0;
 		cursor:ew-resize;
-		background:#ff0000;
+		//background:#ff0000;
 		border:0 !important;
 
 		&::before,&::after{

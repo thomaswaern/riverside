@@ -8,8 +8,9 @@
 	height:80px;
 	width:24px;
 	border-radius:30px;
-   	box-shadow:         inset -1px 2px 8px #333;
+   	box-shadow:inset -1px 2px 8px #333;
    	padding-bottom:28px;
+   	z-index:1000;
 
    	.noUi-target{
    		border:0;
