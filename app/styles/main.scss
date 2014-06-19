@@ -50,7 +50,7 @@ body,html{
 }
 
 body {
-    background: #333 url(../images/mochaGrunge.png);
+    background: #333 url(../images/mochaGrunge.gif);
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #333;
     //display:flex;
@@ -91,7 +91,7 @@ nav{
 
     #contact{
         .note{
-
+            text-transform: uppercase;
             position:absolute;
             width:130px;
             height:20px;
@@ -102,16 +102,16 @@ nav{
             color:#403616;
             text-shadow:0 0 1px #645633;
             padding: 0;
-            top: 50%;
+            top: 50.4%;
             left: 50%;
-            font-size:14px;
+            font-size:13px;
             text-align: center;
             margin-left: -65px;
             //pointer-events: none;
 
         }
         .stopper{
-                background: transparent url(../images/stopper.png) no-repeat;
+                background: transparent url(../images/stopper.gif) no-repeat;
                 background-size:contain;
                 background-position: center center;
                 width:80px;
@@ -129,7 +129,7 @@ nav{
 
         height:100%;
         display:flex;
-        background: transparent url(../images/phonering_label.png) no-repeat;
+        background: transparent url(../images/phonering_label.gif) no-repeat;
         background-size:300px 300px;
         background-position: center center;
         justify-content:center;
@@ -157,7 +157,7 @@ nav{
                 height:300px;
                 padding:0;
                 margin:auto;
-                background: transparent url(../images/phonering_numbers.png) no-repeat;
+                background: transparent url(../images/phonering_numbers.gif) no-repeat;
                 background-size:contain;
                 background-position: center center;
                 list-style:none;
@@ -401,7 +401,7 @@ nav{
             margin-top: 15%;
             padding-bottom: 40%;
 
-        
+
             & iframe,
             & object,
             & embed {

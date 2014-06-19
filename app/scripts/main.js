@@ -4,7 +4,9 @@ var app, record, television, contact;
 
 $(function () {
 
-    $('a[href*=#]:not([href=#])').on('click',function () {
+    $('a[href*=#]:not([href=#])').on('click',function (e) {
+
+        e.preventDefault();
 
         var target = this.hash.slice(1);
 
@@ -190,12 +192,13 @@ var Contact = function ($) {
         numberToCall = '';
         hasAnswered = true;
         $('.ring').addClass('active');
-        $('.note').html(numberToCall);
+
         contact.instance.enable();
         //$('.ring .links li').addClass('iconized');
     }
 
     var doCall = function(){
+
 
         calling = true;
 
@@ -203,12 +206,13 @@ var Contact = function ($) {
 
         app.playSoundEffect('dialtone', true);
 
+
         setTimeout(function() {
             if(app.getCurrentPage() === 'contact'){
                 app.stopAllSounds();
                 answerPhone();
             }
-        }, Math.random()*10000);
+        }, Math.random()*10000 + 3000);
     }
 
     var getContactLink = function(){
@@ -242,7 +246,7 @@ var Contact = function ($) {
             }
         }
 
-        $('.note').html(numberToCall);
+        $('.note').text(numberToCall);
     }
 
     var setCurrentItem = function(item){
@@ -257,6 +261,7 @@ var Contact = function ($) {
             numberToCall = '';
             hasAnswered = false;
             calling = false;
+
 
             Draggable.create('.ring', {
                 type: 'rotation',
@@ -428,6 +433,7 @@ var Television = function ($) {
                 $link.addClass('active');
             }else{
                 player.stopVideo();
+                app.playSoundEffect('channel',false);
                 $channels.find('a').removeClass('active');
                 $channels.find('li:last a').addClass('active');
             }
