@@ -24,16 +24,16 @@ var App = function ($) {
     var _currentPage = 'audio';
 
     var soundEffects = {
-        crackling: new Audio('../sounds/needle.ogg'),
-        end: new Audio('../sounds/endloop.ogg'),
-        channel: new Audio('../sounds/btn.ogg'),
-        dial: new Audio('../sounds/dial_short.ogg'),
-        dialBack: new Audio('../sounds/dialback.ogg'),
-        dialEnd: new Audio('../sounds/dialend.ogg'),
-        tv: new Audio('../sounds/tv.ogg'),
-        wrongnumber: new Audio('../sounds/wrongnumber.ogg'),
-        dialtone: new Audio('../sounds/dialtone.ogg'),
-        answer: new Audio('../sounds/answer.ogg')
+        crackling: new Audio('sounds/needle.ogg'),
+        end: new Audio('sounds/endloop.ogg'),
+        channel: new Audio('sounds/btn.ogg'),
+        dial: new Audio('sounds/dial_short.ogg'),
+        dialBack: new Audio('sounds/dialback.ogg'),
+        dialEnd: new Audio('sounds/dialend.ogg'),
+        tv: new Audio('sounds/tv.ogg'),
+        wrongnumber: new Audio('sounds/wrongnumber.ogg'),
+        dialtone: new Audio('sounds/dialtone.ogg'),
+        answer: new Audio('sounds/answer.ogg')
     };
 
     var pages = [
