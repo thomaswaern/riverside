@@ -658,7 +658,6 @@ var Record = function ($) {
                 }
             });
 
-
             $('.arm').css('-webkit-animation', 'wobblearm 4.3s infinite');
 
             //Spin that shit, and move arm
@@ -726,6 +725,7 @@ var Record = function ($) {
             //Go to next track
             if (currentTrack >= (tracks.length - 1)) {
                 //currentTrack = 0;
+                $('.arm').css('-webkit-animation', 'wobblearm 4.3s infinite');
             } else {
                 currentTrack++;
                 this.playCurrentTrack(0);
