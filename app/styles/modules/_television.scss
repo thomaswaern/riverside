@@ -1,0 +1,286 @@
+.tv{
+
+    /* Measure */
+    width:100%;
+    height:100%;
+
+    /* Behavior */
+    display:flex;
+    justify-content:center;
+
+    .frame{
+
+        /* Measure */
+        width:700px * 1.5;
+        height:480px * 1.5;
+
+        /* Position */
+        position: relative;
+        margin:auto;
+
+        /* Behavior */
+        z-index:8;
+        /* Pseudo */
+
+        ul.controls{
+
+            /* Measure */
+            width: 17.5%;
+            height: 5%;
+
+            /* Appearence */
+            list-style: none;
+            padding: 0;
+
+            /* Position */
+            position: absolute;
+            margin:45.7% 0 0 0;
+            left: 67.1%;
+
+            /* Behavior */
+            white-space:no-wrap;
+
+            >li{
+
+                /* Measure */
+                width: 48.5%;
+                height: 0;
+
+                /* Appearence */
+                color: rgba(255, 255, 255, 0.9);
+                text-shadow: -1px -1px 1px #222;
+                text-decoration: none;
+                line-height:1.5em;
+                padding: 0 0 11%;
+                text-transform: uppercase;
+                font-size: 1.2vw;
+                letter-spacing:.2em;
+                text-align: center;
+
+                /* Position */
+                margin-top: 0%;
+                margin-left: 0.3%;
+
+                /* Behavior */
+                display: block;
+                cursor: pointer;
+                float: left;
+
+                /* Pseudo */
+                &:active{
+                    color:darken(white,25%);
+                }
+
+                &.prev{
+                    border-right:2px solid black;
+                }
+
+            }
+        }
+
+
+        ul.channels{
+
+            /* Measure */
+            width: 17.5%;
+            height: 5%;
+
+            /* Appearence */
+            opacity: 0.5;
+            padding: 0;
+            list-style: none;
+            padding-left: 0;
+
+            /* Position */
+            position: absolute;
+            margin: 0;
+            left: 67.1%;
+            margin-top:50%;
+
+            /* Behavior */
+
+            /* Pseudo */
+
+
+            >li{
+
+                /* Measure */
+                height: 100%;
+                width: 15%;
+
+                /* Appearence */
+
+                /* Position */
+                margin:0 0.9% 0 0.3%;
+
+                /* Behavior */
+                cursor: pointer;
+                display: block;
+                float: left;
+
+                /* Pseudo */
+
+                &:hover{
+                    a{
+                        background:red;
+                        box-shadow: 0 0 5px 6px darken(red,25%);
+                    }
+                }
+
+                a{
+                    /* Measure */
+                    height:20%;
+                    width:20%;
+
+                    /* Appearence */
+                    background: #3d0000;
+                    border-radius:50%;
+
+                    /* Position */
+                    margin:33% auto 0;
+
+                    /* Behavior */
+                    display:block;
+
+                    /* Pseudo */
+
+                    &.active{
+                        background:red;
+                        box-shadow: 0 0 5px 6px darken(red,25%);
+                    }
+                }
+            }
+        }
+
+        .sliders{
+
+            /* Measure */
+            width: 13%;
+            height: 0;
+
+            /* Appearence */
+            padding-bottom: 6%;
+
+            /* Position */
+            position: absolute;
+            left: 71.4%;
+            top: 0;
+            margin: 36% 0 0 0;
+
+            /* Behavior */
+
+            /* Pseudo */
+
+            img{
+                width:20px;
+            }
+
+            >div{
+
+                float: left;
+                margin-right: 2%;
+                width: 20%;
+
+                &.noUi-background{
+                    background: none;
+                    border:0;
+                    box-shadow:none;
+
+                }
+
+                .noUi-handle{
+
+                    /* Measure */
+                    width: 109%;
+                    height: 0;
+
+                    /* Appearence */
+                    background: transparent url(../images/tvslider.png) no-repeat;
+                    background-size: contain;
+                    padding-bottom: 124%;
+                    border: 0;
+                    box-shadow: none;
+
+                    /* Position */
+                    left: -30%;
+                    top: 0;
+                    margin-top:-62%;
+
+                    /* Behavior */
+
+                    /* Pseudo */
+                    &:before,&:after{
+                        display:none;
+                    }
+                }
+
+                &:last-child{
+                    margin:0;
+                }
+            }
+
+
+        }
+    }
+
+    /* The tv surface */
+    .cover{
+
+        /* Measure */
+        width: 100%;
+        height: 0;
+
+        /* Appearence */
+        background: transparent url(../images/tv2_opt.png);
+        background-size:contain;
+        background-position:center center;
+        background-repeat: no-repeat;
+        padding-bottom: 50%;
+
+        /* Position */
+        position:absolute;
+        left: 0;
+        margin-top: 10.3%;
+        margin-left: 0;
+
+        /* Behavior */
+        overflow:hidden;
+
+        /* Pseudo */
+
+    }
+
+    #player{
+
+        /* Measure */
+        width: 50%;
+        height: 0;
+
+        /* Appearence */
+        background: white url(../images/noise.gif) no-repeat;
+        background-size:cover;
+        padding-bottom: 40%;
+
+        /* Position */
+        position:absolute;
+        top:0;
+        left: 15%;
+        margin-top: 15%;
+
+        /* Behavior */
+        overflow:hidden;
+
+        /* Pseudo */
+
+
+        & iframe,
+        & object,
+        & embed {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    }
+}

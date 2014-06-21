@@ -194,9 +194,10 @@ var Contact = function ($) {
         //Makes sure icons are shown instead of numbers
         $('.ring').addClass('active');
 
-        contact.instance.enable();
+        app.pages['contact'].instance.enable();
 
-    }
+    };
+
     /**
      * Go into calling mode when correct number has been dialed
     */
@@ -204,7 +205,7 @@ var Contact = function ($) {
 
         calling = true;
 
-        contact.instance.disable();
+        app.pages['contact'].instance.disable();
 
         app.playSoundEffect('dialtone', true);
 
@@ -215,7 +216,7 @@ var Contact = function ($) {
                 answerPhone();
             }
         }, Math.random()*10000 + 3000);
-    }
+    };
 
     /**
      * Show contact link when a dial has been made
@@ -234,7 +235,7 @@ var Contact = function ($) {
 
         //Show contact link
         $('.note').html($link);
-    }
+    };
 
     /**
      * Add the dialed number to number to call, and perform a number check
@@ -250,7 +251,7 @@ var Contact = function ($) {
         checkNumber(numberToCall);
 
         $('.note').text(numberToCall);
-    }
+    };
 
     /**
      * Check total number and call if correct, otherwise reset
@@ -258,21 +259,21 @@ var Contact = function ($) {
     var checkNumber = function(number){
         if(number.length >= 5){
             if(number === window.contactCode){
-                contact.instance.disable();
+                app.pages['contact'].instance.disable();
                 doCall();
             }else{
                 app.playSoundEffect('wrongnumber', false);
                 numberToCall = '';
             }
         }
-    }
+    };
 
     /**
      * Store a reference to curren dial-item
     */
     var setCurrentItem = function(item){
         currentItem = item;
-    }
+    };
 
     return{
 
@@ -299,7 +300,7 @@ var Contact = function ($) {
 
                 onPress : function(e){
 
-                    contact.instance = this;
+                    app.pages['contact'].instance = this;
 
                     if(e.target.nodeName !== 'LI'){
                         maxrot = 0;
@@ -324,7 +325,7 @@ var Contact = function ($) {
                     //Force ring into dragEnd when these criterias are filled
                     if(this.rotation === this.maxRotation && (e.type === 'mousemove' || e.type === 'touchmove')){
 
-                        contact.instance.disable();
+                        app.pages['contact'].instance.disable();
 
                         //Add number or get contect link
                         if(hasAnswered){
@@ -340,7 +341,7 @@ var Contact = function ($) {
 
                     //Rollback and disable if any of these rules are met
                     if(e.target.nodeName === 'DIV' || e.target.nodeName === 'UL' || e.target.nodeName === 'LI'){
-                        contact.instance.disable();
+                        app.pages['contact'].instance.disable();
                     }else{
                         this.kill();
                     }
@@ -357,7 +358,7 @@ var Contact = function ($) {
                         app.playSoundEffect('dialEnd',false);
 
                         //When rollback completed, enable the Draggable instance again
-                        if(!calling){contact.instance.enable()};
+                        if(!calling){app.pages['contact'].instance.enable();}
 
                     }});
                 }
@@ -365,7 +366,7 @@ var Contact = function ($) {
         }
     };
 
-}
+};
 
 var Television = function ($) {
 
@@ -422,10 +423,10 @@ var Television = function ($) {
 
                 var feedTitle = item.title.$t;
                 var feedURL = item.link[1].href;
-                var fragments = feedURL.split("/");
+                var fragments = feedURL.split('/');
                 var videoID = fragments[fragments.length - 2];
                 //var url = videoURL + videoID;
-                var thumb = "http://img.youtube.com/vi/"+ videoID +"/default.jpg";
+                var thumb = 'http://img.youtube.com/vi/'+ videoID +'/default.jpg';
 
                 //Store ID parameter in playlist array
                 currentPlaylist.push(videoID);
@@ -436,7 +437,7 @@ var Television = function ($) {
 
         });
 
-    }
+    };
 
     var getPlaylists = function(user){
 
@@ -465,15 +466,15 @@ var Television = function ($) {
 
             });
 
-            $(channels_html).prependTo("ul.channels");
+            $(channels_html).prependTo('ul.channels');
 
-            $("ul.channels li:eq(0) a").addClass('active');
+            $('ul.channels li:eq(0) a').addClass('active');
 
             loadPlaylistTracks(playlists[0]);
 
         });
 
-    }
+    };
 
     var prepare = function(playlistID){
 
@@ -620,7 +621,7 @@ var Television = function ($) {
 
     var loadVideo = function(id){
 
-        if(!currentPlaylist.length < 1){
+        if(currentPlaylist.length > 0){
             $('#player iframe').css('opacity', 0.3);
             app.sound('tv').volume = 0.4;
             setTimeout(function() {player.loadVideoById(id, 5, 'large');}, 500);
@@ -633,7 +634,7 @@ var Television = function ($) {
     };
 
     var setBrightness = function(val){
-        if(!currentPlaylist.length < 1){
+        if(currentPlaylist.length > 0){
             $('#player iframe').css('opacity', val/100);
             app.sound('tv').volume = 1 - (val/100);
         }
@@ -642,7 +643,7 @@ var Television = function ($) {
 
     var setSaturation = function(val){
         //$('#player iframe').css('opacity', 'saturate(val+'%'));
-    }
+    };
 
     return{
         prepare : prepare,

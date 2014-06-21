@@ -1,0 +1,219 @@
+#contact{
+
+    /* The textcontainer on the phone's label */
+    .note{
+
+        /* Measure */
+        width:130px;
+        height:20px;
+
+        /* Appearence */
+        text-align: center;
+        padding: 0;
+        text-shadow:0 0 1px #645633;
+        text-transform: uppercase;
+        font-size:13px;
+
+        /* Position */
+        position:absolute;
+        top: 50.4%;
+        left: 50%;
+        margin:15px 0 0 -65px;
+
+        /* Behavior */
+        overflow:hidden;
+
+    }
+
+    /* The chunk of metal that limits dial movement */
+    .stopper{
+
+        /* Measure */
+        width:80px;
+        height:80px;
+
+        /* Appearence */
+        background: transparent url(../images/stopper.gif) no-repeat;
+        background-size:contain;
+        background-position: center center;
+
+        /* Position */
+        position:absolute;
+        top:50%;
+        left:50%;
+        margin:50px 0 0 40px;
+
+        /* Behavior */
+        pointer-events: none;
+
+    }
+}
+
+/* A container for phone parts */
+.phone{
+
+    /* Display */
+    display:flex;
+    justify-content:center;
+
+    /* Measure */
+    height:100%;
+
+    /* Appearence */
+    background: transparent url(../images/phonering_label.gif) no-repeat;
+    background-size:300px 300px;
+    background-position: center center;
+
+    /* A container for the central parts af the phone */
+    .ring{
+
+        /* Display */
+        display:flex;
+        justify-content:center;
+
+        /* Measure */
+        width:100%;
+        height:100%;
+
+        /* Position */
+        position:relative;
+        margin:auto;
+
+        /* Pseudo */
+        &.active{
+            ul{
+                li{
+                    a{
+                        //Enable pointer events only if ring is set to active
+                        pointer-events:auto;
+                    }
+                }
+            }
+        }
+
+        /* The moving central part which contains all numbers */
+        ul{
+
+            /* Measure */
+            width:300px;
+            height:300px;
+
+            /* Appearence */
+            background: transparent url(../images/phonering_numbers.gif) no-repeat;
+            background-size:contain;
+            background-position: center center;
+            list-style:none;
+            padding:0;
+
+            /* Position */
+            position:relative;
+            margin:auto;
+
+            /* Behavior */
+            user-select: none;
+
+            li{
+
+                /* Measure */
+                width:50px;
+                height:50px;
+
+                /* Appearence */
+                border-radius:50%;line-height:45px;
+                font-family: 'Rye', cursive;
+                font-weight:normal;
+                font-size:1.5em;
+                color:#333;
+
+                /* Position */
+                position:absolute;
+
+                /* Behavior */
+                display:block;
+                text-align:center;
+                cursor:pointer;
+                user-select: none;
+
+                /* The number's positions */
+
+                &.current{
+                    background:rgba(lime,0.2);
+                }
+
+                &:hover,&:active{
+                    background:rgba(#a90028,0.2);
+                }
+
+                &:nth-child(1){
+                    right:15px;
+                    top:0;
+                    margin-top:87px;
+                }
+
+                &:nth-child(2){
+                    right:45px;
+                    top:0;
+                    margin-top:40px;
+                }
+
+                &:nth-child(3){
+                    right:95px;
+                    top:0;
+                    margin-top:13px;
+                }
+
+                &:nth-child(4){
+                    right:151px;
+                    top:0;
+                    margin-top:11px;
+                }
+
+                &:nth-child(5){
+                    right:201px;
+                    top:0;
+                    margin-top:37px;
+                }
+
+                &:nth-child(6){
+                    right:233px;
+                    top:0;
+                    margin-top:83px;
+                }
+
+                &:nth-child(7){
+                    right:241px;
+                    top:0;
+                    margin-top:138px;
+                }
+
+                &:nth-child(8n){
+                    right:221px;
+                    top:0;
+                    margin-top:192px;
+                }
+
+                &:nth-child(9n){
+                    right:180px;
+                    top:0;
+                    margin-top:227px;
+                }
+
+                &:nth-child(10n){
+                    right:126px;
+                    top:0;
+                    margin-top:243px;
+                }
+
+                a{
+                    pointer-events:none;
+                    text-decoration:none;
+                    color:#333;
+                }
+
+
+            }
+        }
+
+    }
+
+}

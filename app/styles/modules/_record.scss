@@ -1,82 +1,96 @@
+$base-width:100% * 1.4;
+
 .spinner{
 	overflow:hidden;
 	height:100%;
 	position:relative;
 }
 
-$base-width:100% * 1.4;
-
-/* ul.records{
-	position:absolute;
-	right:0;
-	left:0;
-	bottom:0;
-	background:black;
-	width:100%;
-	height:100px;
-
-
-	li{
-		display:block;
-		height:130px;
-		width:130px;
-		border-radius:3px;
-		margin-left:20px;
-		margin-bottom:20px;
-		background:black;
-		float:left;
-	}
-} */
-
 .record{
+	/* Measure */
+	width:$base-width;
+	height:0;
+
+	/* Appearence */
 	background:#121113;
 	background:url('../images/disc2.jpg') no-repeat center center;
 	background-size:100%;
 	border-radius:50%;
 	border:4px solid #000;
-	width:$base-width;
-	height:0;
+	padding-bottom:$base-width;
+
+	/* Position */
 	position: absolute;
 	margin-left:-$base-width/2;
 	margin-top:-$base-width/2;
-	padding-bottom:$base-width;
+
+	/* Behavior */
+	/* Pseudo */
 
 	label{
+
+		/* Measure */
+		height:0;
+
+		/* Appearence */
 		background:url('../images/label.gif');
 		background-size:cover;
 		background-position:center center;
 		background-repeat:no-repeat;
-		display:block;
-		@include center(35%);
-		height:0;
 		padding-bottom:35%;
 		border-radius:50%;
 		text-align:center;
 		font-family: 'Rye', cursive;
 		line-height:1;
+
+		/* Position */
+		@include center(35%);
+
+		/* Behavior */
+		display:block;
 		user-select: none;
 
+		/* Pseudo */
+
+
 		.artist{
+
+			/* Measure */
+			width:50%;
+
+			/* Appearence */
+			color:#d9dada;
+			font-size: 2.9vw;
+
+			/* Position */
 			position: absolute;
 			top:15%;
 			left:50%;
 			margin-left:-25%;
-			width:50%;
-			color:#d9dada;
-			font-size: 2.9vw;
+
+			/* Behavior */
 			display:none;
+
+
 		}
 
 		.title{
-			position: absolute;
-			top:56%;
-			left:50%;
-			margin-left:-25%;
+
+			/* Measure */
 			width:50%;
+
+			/* Appearence */
 			font-size: 1.2vw;
 			color:white;
 			text-shadow:1px 1px 1px #999;
 			line-height:1.5em;
+
+			/* Position */
+			position: absolute;
+			top:56%;
+			left:50%;
+			margin-left:-25%;
+
 		}
 	}
 
@@ -84,22 +98,28 @@ $base-width:100% * 1.4;
 
 
 .record_spec{
+
+	/* Measure */
+	width:$base-width;
+	height:0;
+
+	/* Appearence */
 	background:#121113;
 	background:url('../images/disc.gif')no-repeat center center;
 	background-size:100%;
 	border-radius:50%;
 	border:4px solid #000;
-	width:$base-width;
-	height:0;
+	padding-bottom:$base-width;
+	opacity:.4;
+	box-shadow: 1px 1px 1px 1px #000;
+
+	/* Position */
 	margin-left:-70%;
 	position: absolute;
-	padding-bottom:$base-width;
 	left:0;
-	//top:-50%;
 	margin-top:-70%;
-	opacity:.4;
-	-webkit-box-shadow: 1px 1px 1px 1px #000;
-	box-shadow: 1px 1px 1px 1px #000;
+
+
 }
 
 .hole{
@@ -108,8 +128,6 @@ $base-width:100% * 1.4;
 	height:3%;
 	border-radius:50%;
 }
-
-
 
 .arm-container{
 
@@ -130,13 +148,22 @@ $base-width:100% * 1.4;
 
 .slider{
 
+	/* Measure */
+	width:$base-width * 0.45;
+
+	/* Appearence */
+	-webkit-transform: rotate(-8deg);
+
+	/* Position */
 	position: absolute;
 	top:0;
 	left:$base-width * 0.07142857142;
 	margin-top:23%;
-	width:$base-width * 0.45;
-	-webkit-transform: rotate(-8deg);
 
+
+	/* Behavior */
+
+	/* Pseudo */
 	&.noUi-background{
 		background: none;
 		border:0;
@@ -145,18 +172,25 @@ $base-width:100% * 1.4;
 	}
 
 	.noUi-handle{
+
+		/* Measure */
 		width:150px;
 		height:150px;
+
+		/* Appearence */
+		opacity:0;
 		border-radius:50%;
 		padding:0;
-		left:-55px;
-		top:-55px;
-		border:0;
-		opacity:0;
-		cursor:ew-resize;
-		//background:#ff0000;
 		border:0 !important;
 
+		/* Position */
+		left:-55px;
+		top:-55px;
+
+		/* Behavior */
+		cursor:ew-resize;
+
+		/* Pseudo */
 		&::before,&::after{
 			display:none;
 		}
@@ -166,16 +200,4 @@ $base-width:100% * 1.4;
         }
 
 	}
-}
-
-
-button.play{
-	padding:2em;
-	position: absolute;
-	right:10px;
-	top:10px;
-	width:100px;
-	height:100px;
-	background: white;
-	border:0;
 }
