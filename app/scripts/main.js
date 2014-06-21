@@ -1,27 +1,10 @@
 'use strict';
 
-var app, record, television, contact;
-
-$(function () {
-
-    $('a[href*=#]:not([href=#])').on('click',function (e) {
-
-        e.preventDefault();
-
-        var target = this.hash.slice(1);
-
-        app.getAndLoad(target);
-
-    });
-
-
-});
-
-
+var app;
 
 var App = function ($) {
 
-    var _currentPage = 'audio';
+    var _currentPage = 'record';
 
     var soundEffects = {
         crackling: new Audio('sounds/needle.ogg'),
@@ -36,45 +19,21 @@ var App = function ($) {
         answer: new Audio('sounds/answer.ogg')
     };
 
-    var pages = [
-        'audio',
-        'video',
-        'contact'
-    ]
+    var pages = [];
+
+    var pageIndexes = [];
 
     return{
 
-        getAndLoad : function(target){
+        pages : pages,
 
-            var callback;
 
-            app.stopAllSounds();
-
-            switch(target){
-
-                case 'audio':
-
-                    callback = record.prepare;
-                    break;
-
-                case 'video':
-                    record.stop();
-                    //$('.slider').val(24, true);
-
-                    callback = television.prepare;
-                    break;
-
-                case 'contact':
-                    record.stop();
-                    //$('.slider').val(24, true);
-                    callback = contact.prepare;
-                    break;
-
-            }
-
-            app.load(target, callback);
-        },
-
+        /**
+         * Play a sound effect
+         * @param {String} key
+         * @param {Boolean} loop
+         * @return {Audio} sound
+        */
         playSoundEffect: function (key, loop) {
             //soundEffects[key].stop();
             soundEffects[key].loop = loop;
@@ -83,6 +42,14 @@ var App = function ($) {
             return soundEffects[key];
         },
 
+        addPage : function(name, instance){
+            pages[name] = instance;
+            pageIndexes.push(name);
+        },
+
+        /**
+         * Stop all sounds
+        */
         stopAllSounds: function () {
 
             for (var key in soundEffects) {
@@ -90,12 +57,21 @@ var App = function ($) {
             }
         },
 
+        /**
+         * Retrieve a soundeffect from the sfx-library
+         * @param {String} key
+         * @return {Audio} sound
+        */
         sound : function(key){
             return soundEffects[key];
         },
 
+        /**
+         * Setup app event handlers
+        */
         prepare : function(){
 
+            //Setup page shifting switch-slider and handle it´s events
             $('.switch > div').noUiSlider({
 
                 start: 0,
@@ -109,51 +85,74 @@ var App = function ($) {
                 }
 
             }).on({
+                //While the slider is dragged
                 slide: function (e) {
                     var index = parseInt(Math.floor($(this).val()));
-                    app.getAndLoad(pages[index]);
+                    app.load(pageIndexes[index]);
 
                 },
+                //When the slider has moved by a click
                 set: function (e) {
-                    if(typeof(television[$(e.target).data('control')]) === 'function'){
-                        television[$(e.target).data('control')]($(this).val());
+                    if(typeof(app.pages['television'][$(e.target).data('control')]) === 'function'){
+                        app.pages['television'][$(e.target).data('control')]($(this).val());
                     }
                 }
             });
+
+            //Click event handler for changeing app module/page with switch's links.
+            $('a[href*=#]:not([href=#])').on('click',function (e) {
+
+                var target = this.hash.slice(1);
+
+                app.load(target);
+
+                $('.switch > div').val($(this).data('index'));
+
+                e.preventDefault();
+
+            });
         },
 
+        /**
+         * Retrieve the current page as a string
+         * @return {String} page
+        */
         getCurrentPage: function () {
             return _currentPage;
         },
 
-        init : function(callback){
-            var f = callback;
-            f();
-        },
-
-        setSwitch : function(index){
-            $('.switch > div').val(index);
-        },
-
-        load : function(part, callback){
-
-            app._initMethod = callback;
-
-            _currentPage = part;
+        /**
+         * Load a page and init it's module
+         * @param {String} part
+        */
+        load : function(part){
 
             $.ajax({
+
                 context: this,
                 dataType : 'html',
-                url : 'templates/'+part+'.html',
+                url : 'pages/'+part+'.html',
 
-                success : function(results) {
+                success : function(page) {
 
-                    $('#wrapper').html(results);
+                    //Try to unload the current module
+                    if(typeof(this.pages[_currentPage].unload) === 'function'){
+                        this.pages[_currentPage].unload();
+                    }
 
-                    app.setSwitch(pages.indexOf(part));
+                    //Add the loaded content to the page container
+                    $('#wrapper').html(page);
 
-                    app.init(callback);
-                }
+                    //Update the app-modules current page reference
+                    _currentPage = part;
+
+                    //Stop all sounds that might be active
+                    this.stopAllSounds();
+
+                    //Init the module's prepare method
+                    this.pages[part].prepare();
+
+                }.bind(this)
             });
         }
     };
@@ -168,14 +167,6 @@ var Contact = function ($) {
         hasAnswered = false,
         calling = false;
 
-    var getAngle = function(deltaX,deltaY){
-        
-        var deg = Math.tan(deltaX/deltaY);
-        deg *= 57.2957795;
-
-        return deg;
-    }
-
     var links = [
         ['+46(0)708-138138','tel:0708138138','_self'],
         ['hey@riverside.com','mailto:hey@riverside.com','_blank'],
@@ -186,19 +177,30 @@ var Contact = function ($) {
         ['Instagram','http://instagram.com/riversidesociety','_blank']
     ];
 
+    /**
+     * Reveals all contact information
+    */
     var answerPhone = function(){
+
         calling = false;
+
         app.playSoundEffect('answer',false);
+
         numberToCall = '';
+
+        //Used to tell if dialing should add number or show contact info
         hasAnswered = true;
+
+        //Makes sure icons are shown instead of numbers
         $('.ring').addClass('active');
 
         contact.instance.enable();
-        //$('.ring .links li').addClass('iconized');
+
     }
-
+    /**
+     * Go into calling mode when correct number has been dialed
+    */
     var doCall = function(){
-
 
         calling = true;
 
@@ -206,7 +208,7 @@ var Contact = function ($) {
 
         app.playSoundEffect('dialtone', true);
 
-
+        //Call for a random amount of seconds before answer
         setTimeout(function() {
             if(app.getCurrentPage() === 'contact'){
                 app.stopAllSounds();
@@ -215,19 +217,28 @@ var Contact = function ($) {
         }, Math.random()*10000 + 3000);
     }
 
+    /**
+     * Show contact link when a dial has been made
+    */
     var getContactLink = function(){
 
+        //Get the index of the dialed item
         var index = $(currentItem).index();
 
+        //Generate a link with the indexed link information
         var $link = $('<a/>', {
             'href' : links[index][1],
             'target' : links[index][2],
             text : links[index][0]
         });
 
+        //Show contact link
         $('.note').html($link);
     }
 
+    /**
+     * Add the dialed number to number to call, and perform a number check
+    */
     var saveNumber = function(){
 
         if(hasAnswered){
@@ -236,8 +247,17 @@ var Contact = function ($) {
 
         numberToCall += currentItem.text();
 
-        if(numberToCall.length >= 5){
-            if(numberToCall === '67285'){
+        checkNumber(numberToCall);
+
+        $('.note').text(numberToCall);
+    }
+
+    /**
+     * Check total number and call if correct, otherwise reset
+    */
+    var checkNumber = function(number){
+        if(number.length >= 5){
+            if(number === window.contactCode){
                 contact.instance.disable();
                 doCall();
             }else{
@@ -245,16 +265,20 @@ var Contact = function ($) {
                 numberToCall = '';
             }
         }
-
-        $('.note').text(numberToCall);
     }
 
+    /**
+     * Store a reference to curren dial-item
+    */
     var setCurrentItem = function(item){
         currentItem = item;
     }
 
     return{
 
+        /**
+         * Init the phone
+        */
         prepare : function(){
 
             var self = this;
@@ -262,7 +286,7 @@ var Contact = function ($) {
             hasAnswered = false;
             calling = false;
 
-
+            //Creates the Draggable (GSAP) instance
             Draggable.create('.ring', {
                 type: 'rotation',
                 trigger:'.ring .links',
@@ -275,7 +299,6 @@ var Contact = function ($) {
 
                 onPress : function(e){
 
-                    
                     contact.instance = this;
 
                     if(e.target.nodeName !== 'LI'){
@@ -290,51 +313,53 @@ var Contact = function ($) {
                         maxRotation:maxrot
                     });
                 },
+
                 onDrag : function(e){
 
+                    //Play dragsound on measurable movement (prevent from fire if only pressed)
                     if(this.rotation > 10){
                         app.playSoundEffect('dial',false);
                     }
 
+                    //Force ring into dragEnd when these criterias are filled
                     if(this.rotation === this.maxRotation && (e.type === 'mousemove' || e.type === 'touchmove')){
-
-                        /*
-                            if(e.target.nodeName !== 'LI'){
-                            contact.instance.kill();
-                        }*/
 
                         contact.instance.disable();
 
+                        //Add number or get contect link
                         if(hasAnswered){
                             getContactLink();
                         }else{
                             saveNumber();
                         }
 
-                        //currentItem.addClass('current').siblings().removeClass('current');
-
                     }
                 },
 
                 onDragEnd:function(e) {
 
+                    //Rollback and disable if any of these rules are met
                     if(e.target.nodeName === 'DIV' || e.target.nodeName === 'UL' || e.target.nodeName === 'LI'){
                         contact.instance.disable();
-
                     }else{
                         this.kill();
                     }
 
+                    //Cache the ring
                     var $target = $('.ring');
 
                     app.stopAllSounds();
                     app.playSoundEffect('dialBack',false);
 
+                    //Rollback animation. Length is depending on which item that was dragged
                     TweenMax.to($target, maxrot/400, {rotation:0, onComplete:function(){
-                        app.playSoundEffect('dialEnd',false);
-                        if(!calling){contact.instance.enable()};
-                    }});
 
+                        app.playSoundEffect('dialEnd',false);
+
+                        //When rollback completed, enable the Draggable instance again
+                        if(!calling){contact.instance.enable()};
+
+                    }});
                 }
             });
         }
@@ -344,35 +369,54 @@ var Contact = function ($) {
 
 var Television = function ($) {
 
+    //Inject youtube api
     var tag = document.createElement('script');
     tag.src = 'https://www.youtube.com/iframe_api';
-
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
     var player;
-    var playlist = [];
+    var currentPlaylist = [], playlists = [];
+    var currentVideoIndex;
     var done = false;
 
     var init = function(){
-        
+
+        currentVideoIndex = 0;
+
+        if(!player){
+
+            player = new YT.Player('iframe', {
+                height: '390',
+                width: '640',
+                volume:100,
+                videoId: currentPlaylist[currentVideoIndex],
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }else{
+            loadVideo(currentPlaylist[currentVideoIndex]);
+        }
 
 
     };
 
-    var prepare = function(){
+    /**
+     * Get youtube feed data for a specified playlist ID and store videos in playlist array
+     * @param {String} key
+     * @return {Audio} sound
+    */
+    var loadPlaylistTracks = function(playlistID){
 
+        var playListURL = 'http://gdata.youtube.com/feeds/api/playlists/'+ playlistID +'?v=2&alt=json&callback=?';
 
-
-        app.playSoundEffect('tv',true);
-        app.sound('tv').volume = 0;
-
-        var playListURL = 'http://gdata.youtube.com/feeds/api/playlists/PL4dadaf1ycyVnQTJ9INfD0jfFF_XDF2cG?v=2&alt=json&callback=?';
-        var videoURL= 'http://www.youtube.com/watch?v=';
-
+        //Retrieve the items from the requested playlist ID.
         $.getJSON(playListURL, function(data) {
 
-            var list_data="";
+            //Empty current playlist
+            currentPlaylist = [];
 
             $.each(data.feed.entry, function(i, item) {
 
@@ -380,41 +424,78 @@ var Television = function ($) {
                 var feedURL = item.link[1].href;
                 var fragments = feedURL.split("/");
                 var videoID = fragments[fragments.length - 2];
-                var url = videoURL + videoID;
+                //var url = videoURL + videoID;
                 var thumb = "http://img.youtube.com/vi/"+ videoID +"/default.jpg";
 
-                playlist.push(videoID);
-
-                if (videoID !='videos') {
-                    list_data += '<li><a href="" data-id="' + videoID + '"></a></li>';
-                }
+                //Store ID parameter in playlist array
+                currentPlaylist.push(videoID);
 
             });
 
-            player = new YT.Player('iframe', {
-                height: '390',
-                width: '640',
-                volume:100,
-                videoId: playlist[0],
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange
-                }
-            });
-
-
-            $(list_data).appendTo("ul.channels");
-
-            var $channels = $('ul.channels');
-            $channels.find('li:first a').addClass('active');
-            $channels.append('<li style="float:right;"><a href="#" class="onoff"></li>');
+            init();
 
         });
 
+    }
 
+    var getPlaylists = function(user){
 
-        
-        $('ul.channels').on('click','li', function(e){
+        var userPlaylistsUrl = 'https://gdata.youtube.com/feeds/api/users/' + user + '/playlists?v=2&alt=json';
+
+        //Retrieve the playlists from the requested user ID.
+        $.getJSON(userPlaylistsUrl, function(data) {
+
+            var channels_html = '';
+
+            $.each(data.feed.entry, function(i, item) {
+
+                var playlistID = item.yt$playlistId.$t;
+
+                //Store playlist ID parameter in playlists array
+                playlists.push(playlistID);
+
+                //Generate channel-button
+                if (playlistID !='videos') {
+                    channels_html += '<li><a href="" data-id="' + playlistID + '"></a></li>';
+                }
+
+                /*var $channels = $('ul.channels');
+                $channels.find('li:first a').addClass('active');
+                $channels.append('');*/
+
+            });
+
+            $(channels_html).prependTo("ul.channels");
+
+            $("ul.channels li:eq(0) a").addClass('active');
+
+            loadPlaylistTracks(playlists[0]);
+
+        });
+
+    }
+
+    var prepare = function(playlistID){
+
+        app.playSoundEffect('tv',true);
+        app.sound('tv').volume = 0;
+
+        player = null;
+
+        //Retrieve all the user's playlists
+        getPlaylists('riversidesoc');
+
+        $('.controls .prev').on('click', function(e){
+            e.preventDefault();
+            prevVideo();
+        });
+
+        $('.controls .next').on('click', function(e){
+            e.preventDefault();
+            nextVideo();
+        });
+
+        $('.channels').on('click','li', function(e){
 
             e.preventDefault();
 
@@ -422,23 +503,33 @@ var Television = function ($) {
                 $link = $target.find('a'),
                 $channels = $('.channels');
 
-
             if($target.find('a').data('id')){
 
-                var videoID =$link.data('id');
+                var playlistID =$link.data('id');
 
-                loadVideo(videoID);
+                loadPlaylistTracks(playlistID);
+
                 app.playSoundEffect('channel',false);
+
                 $target.siblings().find('a').removeClass('active');
                 $link.addClass('active');
+
             }else{
+
+                //Event trigger is probably the onoff-button
+
                 player.stopVideo();
+
+                currentPlaylist = [];
+
                 app.playSoundEffect('channel',false);
+
                 $channels.find('a').removeClass('active');
+
                 $channels.find('li:last a').addClass('active');
+
             }
 
-            
 
         });
 
@@ -460,14 +551,14 @@ var Television = function ($) {
             }).on({
                 slide: function (e) {
 
-                    if(typeof(television[$(e.target).data('control')]) === 'function'){
-                        television[$(e.target).data('control')]($(this).val());
+                    if(typeof(app.pages['television'][$(e.target).data('control')]) === 'function'){
+                        app.pages['television'][$(e.target).data('control')]($(this).val());
                     }
 
                 },
                 set: function (e) {
-                    if(typeof(television[$(e.target).data('control')]) === 'function'){
-                        television[$(e.target).data('control')]($(this).val());
+                    if(typeof(app.pages['television'][$(e.target).data('control')]) === 'function'){
+                        app.pages['television'][$(e.target).data('control')]($(this).val());
                     }
                 }
             });
@@ -485,8 +576,7 @@ var Television = function ($) {
         }
 
         if(event.data === YT.PlayerState.ENDED){
-            player.seekTo(0);
-            player.playVideo();
+            nextVideo();
         }
 
         if(done){
@@ -495,6 +585,28 @@ var Television = function ($) {
         }
 
     };
+
+    function prevVideo(){
+
+        if(currentVideoIndex > 0){
+            currentVideoIndex--;
+        }else{
+            currentVideoIndex = currentPlaylist.length - 1;
+        }
+
+        loadVideo(currentPlaylist[currentVideoIndex]);
+    }
+
+    function nextVideo(){
+
+        if(currentVideoIndex < currentPlaylist.length - 1){
+            currentVideoIndex++;
+        }else{
+            currentVideoIndex = 0;
+        }
+
+        loadVideo(currentPlaylist[currentVideoIndex]);
+    }
 
     function stopVideo() {
         //this.player.stopVideo();
@@ -507,9 +619,13 @@ var Television = function ($) {
     };
 
     var loadVideo = function(id){
-        $('#player iframe').css('opacity', 0.3);
-        app.sound('tv').volume = 0.4;
-        setTimeout(function() {player.loadVideoById(id, 5, 'large');}, 500);
+
+        if(!currentPlaylist.length < 1){
+            $('#player iframe').css('opacity', 0.3);
+            app.sound('tv').volume = 0.4;
+            setTimeout(function() {player.loadVideoById(id, 5, 'large');}, 500);
+        }
+
     };
 
     var setVolume = function(vol){
@@ -517,8 +633,10 @@ var Television = function ($) {
     };
 
     var setBrightness = function(val){
-        $('#player iframe').css('opacity', val/100);
-        app.sound('tv').volume = 1 - (val/100);
+        if(!currentPlaylist.length < 1){
+            $('#player iframe').css('opacity', val/100);
+            app.sound('tv').volume = 1 - (val/100);
+        }
 
     };
 
@@ -604,29 +722,32 @@ var Record = function ($) {
         },
 
         prepare : function(){
+
             SC.whenStreamingReady(function () {
+
                 setTimeout(function () {
+
                     SC.get('/playlists/2373914', function (playlist) {
-                        if(playlist.artwork_url){$('.record label').css('background-image', 'url('+playlist.artwork_url+')');}
-                        record.setTracks(playlist.tracks);
-                        if(app.getCurrentPage() === 'audio'){record.init();}
+
+                        if(playlist.artwork_url){
+                            $('.record label').css('background-image', 'url('+playlist.artwork_url+')');
+                        }
+
+                        app.pages['record'].setTracks(playlist.tracks);
+
+                        if(app.getCurrentPage() === 'record'){
+                            app.pages['record'].init();
+                        }
+
                     }.bind(this));
                 }.bind(this), 2200);
 
             }.bind(this));
 
-            //Disable switch while loading
-            //$('.switch > div').attr('disabled', 'disabled');
 
         },
 
         init: function () {
-
-
-            //Re-eneable switch
-            //$('.switch > div').removeAttr('disabled');
-
-            //var track = this.setCurrentTrack(0);
 
             $('.slider').noUiSlider({
 
@@ -640,13 +761,14 @@ var Record = function ($) {
             });
 
             $('.slider').change(function (e) {
-                record.armMoving = false;
-                record.setPosition($(e.target).val(), 24, 75);
+
+                app.pages['record'].armMoving = false;
+                app.pages['record'].setPosition($(e.target).val(), 24, 75);
             });
 
             $('.slider').on({
                 slide: function () {
-                    record.armMoving = true;
+                    app.pages['record'].armMoving = true;
 
                     $('.arm').css('-webkit-animation', 'none');
                     $('.arm').css('-webkit-transform', 'rotate(-' + $('.slider').val() + 'deg)');
@@ -663,15 +785,13 @@ var Record = function ($) {
             //Spin that shit, and move arm
             $('.record')
                 .css('-webkit-animation', 'rotating 4.3s linear infinite');
-            //$('.arm')
-            //.css('display','block')
-            //.css('-webkit-animation', 'initarm 2s linear 1');
-            //
+
             app.playSoundEffect('end', true);
 
         },
 
         setPosition: function (position, min, max) {
+
 
             var globalTargetPercent = 1 - (position - min) / (max - min),
                 globalTargetTime = totalTime * globalTargetPercent,
@@ -698,7 +818,6 @@ var Record = function ($) {
                     } else {
 
                         trackNumber++;
-
                     }
                 }
 
@@ -745,30 +864,34 @@ var Record = function ($) {
                 //Load the track
                 SC.stream('/tracks/' + this.getCurrentTrack().id, {
                     whileplaying: function () {
-                        if (!record.armMoving && soundObject.loaded) {
+                        if (!app.pages['record'].armMoving && soundObject.loaded) {
                             this.onPosition();
                         }
                     }.bind(this),
                     autoLoad: true
                 }, function (sound) {
+
                     soundObject = sound;
+
                     app.playSoundEffect('crackling', false);
                     soundObject.setVolume(0);
+
                     soundObject.play({
                         onload: function () {
                             soundObject.setVolume(90);
                             soundObject.setPosition(position);
                         },
                         onfinish: function () {
-                            record.next();
-                        }
+                            console.log(this);
+                            this.next();
+                        }.bind(this)
                     });
                 }.bind(this));
             }
 
         },
 
-        stop: function () {
+        unload: function () {
 
             //Stop current sound if any
             try {
@@ -786,14 +909,8 @@ $(document).ready(function(){
     app.prepare();
 });
 
-window.addEventListener("load",function() {
-    setTimeout(function() {
-        window.scrollTo(0, 1);
-    }, 0);
-});
-
 app = new App(jQuery);
-record = new Record(jQuery);
-television = new Television(jQuery);
-contact = new Contact(jQuery);
-app.load('audio', record.prepare);
+app.addPage('record', new Record(jQuery));
+app.addPage('television', new Television(jQuery));
+app.addPage('contact', new Contact(jQuery));
+app.load('record');
