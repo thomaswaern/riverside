@@ -441,7 +441,7 @@ var Television = function ($) {
 
     var getPlaylists = function(user){
 
-        var userPlaylistsUrl = 'https://gdata.youtube.com/feeds/api/users/' + user + '/playlists?v=2&alt=json';
+        var userPlaylistsUrl = 'https://gdata.youtube.com/feeds/api/users/' + user + '/playlists?v=2&alt=json&callback=?';
 
         //Retrieve the playlists from the requested user ID.
         $.getJSON(userPlaylistsUrl, function(data) {
