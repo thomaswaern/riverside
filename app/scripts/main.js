@@ -70,6 +70,17 @@ var App = function ($) {
         */
         prepare : function(){
 
+            if(!Modernizr.touch) {
+                $('#init').remove();
+                this.load('record');
+            }else{
+                $('#init').on('touchstart', function(){
+                    this.playSoundEffect('wrongnumber', false);
+                    this.stopAllSounds();
+                    this.load('record');
+                }.bind(this));
+            }
+
             //Setup page shifting switch-slider and handle it´s events
             $('.switch > div').noUiSlider({
 
@@ -743,6 +754,7 @@ var Record = function ($) {
 
         prepare : function(){
 
+
             SC.whenStreamingReady(function () {
 
                 setTimeout(function () {
@@ -940,4 +952,3 @@ app = new App(jQuery);
 app.addPage('record', new Record(jQuery));
 app.addPage('television', new Television(jQuery));
 app.addPage('contact', new Contact(jQuery));
-app.load('record');
