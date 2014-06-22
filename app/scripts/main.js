@@ -126,6 +126,8 @@ var App = function ($) {
         */
         load : function(part){
 
+            ga('send', 'event', 'app', 'loadPage', part);
+
             $.ajax({
 
                 context: this,
@@ -208,13 +210,17 @@ var Contact = function ($) {
 
         app.playSoundEffect('dialtone', true);
 
+        var wait = Math.random()*10000 + 3000;
+
+        ga('send', 'event', 'contact', 'calling', 'wait', wait);
+
         //Call for a random amount of seconds before answer
         setTimeout(function() {
             if(app.getCurrentPage() === 'contact'){
                 app.stopAllSounds();
                 answerPhone();
             }
-        }, Math.random()*10000 + 3000);
+        }, wait);
     };
 
     /**
@@ -224,6 +230,8 @@ var Contact = function ($) {
 
         //Get the index of the dialed item
         var index = $(currentItem).index();
+
+        ga('send', 'event', 'contact', 'link', links[index][0]);
 
         //Generate a link with the indexed link information
         var $link = $('<a/>', {
@@ -256,6 +264,9 @@ var Contact = function ($) {
      * Check total number and call if correct, otherwise reset
     */
     var checkNumber = function(number){
+
+        ga('send', 'event', 'contact', 'number', number);
+
         if(number.length >= 5){
             if(number === window.contactCode){
                 app.pages['contact'].instance.disable();
@@ -263,6 +274,7 @@ var Contact = function ($) {
             }else{
                 app.playSoundEffect('wrongnumber', false);
                 numberToCall = '';
+                ga('send', 'event', 'contact', 'wrongnumber', number);
             }
         }
     };
@@ -410,6 +422,8 @@ var Television = function ($) {
     */
     var loadPlaylistTracks = function(playlistID){
 
+        ga('send', 'event', 'television', 'loadPlaylist', playlistID);
+
         var playListURL = 'http://gdata.youtube.com/feeds/api/playlists/'+ playlistID +'?v=2&alt=json&callback=?';
 
         //Retrieve the items from the requested playlist ID.
@@ -518,6 +532,8 @@ var Television = function ($) {
 
                 //Event trigger is probably the onoff-button
 
+                ga('send', 'event', 'television', 'turnoff', currentPlaylist[currentVideoIndex]);
+
                 player.stopVideo();
 
                 currentPlaylist = [];
@@ -588,6 +604,8 @@ var Television = function ($) {
 
     function prevVideo(){
 
+        ga('send', 'event', 'television', 'skipToNext', currentPlaylist[currentVideoIndex]);
+
         if(currentVideoIndex > 0){
             currentVideoIndex--;
         }else{
@@ -619,6 +637,8 @@ var Television = function ($) {
     };
 
     var loadVideo = function(id){
+
+        ga('send', 'event', 'television', 'load', id);
 
         if(currentPlaylist.length > 0){
             $('#player iframe').css('opacity', 0.3);
@@ -764,7 +784,8 @@ var Record = function ($) {
 
                 app.pages['record'].armMoving = false;
                 app.pages['record'].setPosition($(e.target).val(), 24, 75);
-            });
+
+            }.bind(this));
 
             $('.slider').on({
                 slide: function () {
@@ -825,10 +846,13 @@ var Record = function ($) {
 
             if ((soundObject && soundObject.playState > 0) && (currentTrack === trackNumber)) {
                 soundObject.setPosition(localTargetTime);
+                
             } else {
                 currentTrack = trackNumber;
                 this.playCurrentTrack(localTargetTime);
             }
+
+            ga('send', 'event', 'record', 'setPosition', this.getCurrentTrack().id + ' (' + localTargetTime + ')');
 
         },
 
@@ -849,6 +873,9 @@ var Record = function ($) {
                 currentTrack++;
                 this.playCurrentTrack(0);
             }
+
+            ga('send', 'event', 'record', 'next', this.getCurrentTrack().id);
+
 
         },
 
