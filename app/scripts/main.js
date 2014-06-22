@@ -27,7 +27,6 @@ var App = function ($) {
 
         pages : pages,
 
-
         /**
          * Play a sound effect
          * @param {String} key
