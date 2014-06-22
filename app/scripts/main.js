@@ -77,6 +77,7 @@ var App = function ($) {
                 $('#init').on('touchstart', function(){
                     this.playSoundEffect('wrongnumber', false);
                     this.stopAllSounds();
+                    $('#init').remove();
                     this.load('record');
                 }.bind(this));
             }
