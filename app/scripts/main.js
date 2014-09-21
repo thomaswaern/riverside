@@ -70,13 +70,30 @@ var App = function ($) {
         */
         prepare : function(){
 
-            if(!Modernizr.touch) {
+            this.load('record');
+
+            if(Modernizr.touch) {
                 $('#init').remove();
                 this.load('record');
             }else{
-                $('#init').on('touchstart', function(){
-                    this.playSoundEffect('wrongnumber', false);
-                    this.stopAllSounds();
+                $('#init').on('touchstart, click', function(e){
+                    e.preventDefault();
+
+                    var myContext = new AudioContext();
+
+                    // create new buffer source for playback with an already
+                    // loaded and decoded empty sound file
+                    var source = myContext.createBufferSource();
+                    source.buffer = myDecodedBuffer;
+
+                    // connect to output (your speakers)
+                    source.connect(myContext.destination);
+
+                    // play the file
+                    source.noteOn(0);
+
+
+                    //this.stopAllSounds();
                     $('#init').remove();
                     this.load('record');
                 }.bind(this));
