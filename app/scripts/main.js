@@ -70,7 +70,7 @@ var App = function ($) {
         */
         prepare : function(){
 
-            this.load('record');
+            this.load('menu');
 
             if(Modernizr.touch) {
                 $('#init').remove();
@@ -100,7 +100,7 @@ var App = function ($) {
             }
 
             //Setup page shifting switch-slider and handle it´s events
-            $('.switch > div').noUiSlider({
+            /*$('.switch > div').noUiSlider({
 
                 start: 0,
                 orientation: 'vertical',
@@ -125,10 +125,13 @@ var App = function ($) {
                         app.pages['television'][$(e.target).data('control')]($(this).val());
                     }
                 }
-            });
+            });*/
 
             //Click event handler for changeing app module/page with switch's links.
-            $('a[href*=#]:not([href=#])').on('click',function (e) {
+            $('body').on('click', 'a[href*=#]:not([href=#])',function (e) {
+
+                app.playSoundEffect('dialtone', true);
+
 
                 var target = this.hash.slice(1);
 
@@ -187,6 +190,16 @@ var App = function ($) {
         }
     };
 };
+
+var Menu = function ($) {
+
+    return{
+        prepare:function(){
+
+        }
+    }
+
+}
 
 var Contact = function ($) {
 
@@ -967,6 +980,7 @@ $(document).ready(function(){
 });
 
 app = new App(jQuery);
+app.addPage('menu', new Menu(jQuery));
 app.addPage('record', new Record(jQuery));
 app.addPage('television', new Television(jQuery));
 app.addPage('contact', new Contact(jQuery));

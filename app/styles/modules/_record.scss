@@ -1,5 +1,10 @@
 $base-width:100% * 1.4;
 
+#audio{
+	background:url('../images/recordbg.jpg') no-repeat center center;
+	background-size:cover;
+}
+
 .spinner{
 	overflow:hidden;
 	height:100%;
@@ -135,7 +140,7 @@ $base-width:100% * 1.4;
 		width:$base-width * 0.42857142857;
 		height:0;
 		padding-bottom:100%;
-		background: url('../images/arm_red.gif') no-repeat center center;
+		background: url('../images/arm.gif') no-repeat center center;
 		background-size:contain;
 		position: absolute;
 		left: 0;
