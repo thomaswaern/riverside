@@ -130,8 +130,7 @@ var App = function ($) {
             //Click event handler for changeing app module/page with switch's links.
             $('body').on('click', 'a[href*=#]:not([href=#])',function (e) {
 
-                app.playSoundEffect('dialtone', true);
-
+                app.playSoundEffect('channel', false);
 
                 var target = this.hash.slice(1);
 
