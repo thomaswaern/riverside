@@ -4,7 +4,7 @@ var app;
 
 var App = function ($) {
 
-    var _currentPage = 'record';
+    var _currentPage = 'menu';
 
     var soundEffects = {
         crackling: new Audio('sounds/needle.mp3'),
