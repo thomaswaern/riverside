@@ -21,19 +21,23 @@ body,html{
     bottom:30px;
     width:auto;
     a{
-        background:#f7f7f7;
+        background:#fff;
         text-decoration:none;
         padding:.8em 0;
-        text-align:center;
-        margin:0;
-        width:100px;
+        margin:1em 3em;
         display:block;
-        color:black;
+        color:#333;
         font-size: 12px;
+        opacity:.9;
+        text-align: center;
+        font-family: 'Special Elite', cursive;
+        width:100px;
+        //box-shadow:2px 2px 0 #222;
 
         &:hover{
             background:#eee;
         }
+
 
     }
 }
@@ -41,7 +45,7 @@ body,html{
 
 
 body {
-    background: #0e0e0e;
+    background: #000;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #333;
     overflow:hidden;

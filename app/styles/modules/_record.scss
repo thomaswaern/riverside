@@ -2,7 +2,9 @@ $base-width:100% * 1.4;
 
 #audio{
 	background:url('../images/recordbg.jpg') no-repeat center center;
-	background-size:cover;
+	background-size:contain;
+	background-position:top right;
+
 }
 
 .spinner{
@@ -45,7 +47,7 @@ $base-width:100% * 1.4;
 		padding-bottom:35%;
 		border-radius:50%;
 		text-align:center;
-		font-family: 'Rye', cursive;
+		font-family: 'Special Elite', cursive;
 		line-height:1;
 
 		/* Position */
@@ -64,7 +66,7 @@ $base-width:100% * 1.4;
 			width:50%;
 
 			/* Appearence */
-			color:#d9dada;
+			color:#222;
 			font-size: 2.9vw;
 
 			/* Position */
@@ -86,8 +88,8 @@ $base-width:100% * 1.4;
 
 			/* Appearence */
 			font-size: 1.2vw;
-			color:white;
-			text-shadow:1px 1px 1px #999;
+			color:#222;
+
 			line-height:1.5em;
 
 			/* Position */

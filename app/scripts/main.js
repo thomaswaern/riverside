@@ -46,6 +46,14 @@ var App = function ($) {
             pageIndexes.push(name);
         },
 
+        showLoading : function(){
+
+        },
+
+        hideLoading: function(){
+
+        },
+
         /**
          * Stop all sounds
         */
@@ -73,10 +81,14 @@ var App = function ($) {
             this.load('menu');
 
             if(Modernizr.touch) {
+            
                 $('#init').remove();
-                this.load('record');
+                this.load('menu');
+            
             }else{
+                
                 $('#init').on('touchstart, click', function(e){
+                    
                     e.preventDefault();
 
                     var myContext = new AudioContext();
@@ -92,10 +104,10 @@ var App = function ($) {
                     // play the file
                     source.noteOn(0);
 
-
                     //this.stopAllSounds();
                     $('#init').remove();
                     this.load('record');
+
                 }.bind(this));
             }
 
@@ -159,6 +171,8 @@ var App = function ($) {
 
             ga('send', 'event', 'app', 'loadPage', part);
 
+            this.showLoading();
+
             $.ajax({
 
                 context: this,
@@ -166,6 +180,8 @@ var App = function ($) {
                 url : 'pages/'+part+'.html',
 
                 success : function(page) {
+
+                    this.hideLoading();
 
                     //Try to unload the current module
                     if(typeof(this.pages[_currentPage].unload) === 'function'){
@@ -236,7 +252,7 @@ var Contact = function ($) {
         //Makes sure icons are shown instead of numbers
         $('.ring').addClass('active');
 
-        app.pages['contact'].instance.enable();
+        try{app.pages['contact'].instance.enable();}catch(err){}
 
     };
 
@@ -251,7 +267,7 @@ var Contact = function ($) {
 
         app.playSoundEffect('dialtone', true);
 
-        var wait = Math.random()*10000 + 3000;
+        var wait = Math.random()*5000 + 3000;
 
         ga('send', 'event', 'contact', 'calling', 'wait', wait);
 
@@ -282,7 +298,9 @@ var Contact = function ($) {
         });
 
         //Show contact link
-        $('.note').html($link);
+        //$('.note').html($link);
+
+        window.location = links[index][1];
     };
 
     /**
@@ -338,6 +356,8 @@ var Contact = function ($) {
             numberToCall = '';
             hasAnswered = false;
             calling = false;
+
+            answerPhone();
 
             //Creates the Draggable (GSAP) instance
             Draggable.create('.ring', {
@@ -440,19 +460,26 @@ var Television = function ($) {
         if(!player){
 
             player = new YT.Player('iframe', {
-                height: '390',
-                width: '640',
-                volume:100,
-                videoId: currentPlaylist[currentVideoIndex],
-                events: {
+            
+                'height': '390',
+                'width': '640',
+                'autoplay': 0,
+                'controls': 0,
+                'enablejsapi': 1,
+                'playsinline': 1,
+                'showinfo': 0,
+                'volume':100,
+                'videoId': currentPlaylist[currentVideoIndex],
+                'events': {
                     'onReady': onPlayerReady,
                     'onStateChange': onPlayerStateChange
                 }
             });
+
         }else{
+
             loadVideo(currentPlaylist[currentVideoIndex]);
         }
-
 
     };
 
@@ -465,7 +492,7 @@ var Television = function ($) {
 
         ga('send', 'event', 'television', 'loadPlaylist', playlistID);
 
-        var playListURL = 'http://gdata.youtube.com/feeds/api/playlists/'+ playlistID +'?v=2&alt=json&callback=?';
+        var playListURL = 'http://gdata.youtube.com/feeds/api/playlists/'+ playlistID +'?playsinline&v=2&alt=json&callback=?';
 
         //Retrieve the items from the requested playlist ID.
         $.getJSON(playListURL, function(data) {
@@ -672,7 +699,7 @@ var Television = function ($) {
     }
 
     var onPlayerReady = function(event) {
-        event.target.playVideo();
+        //event.target.playVideo();
         $('#player iframe').css('opacity', 1);
         
     };
@@ -719,6 +746,8 @@ var Television = function ($) {
 var Record = function ($) {
 
     var tracks = [];
+
+    var sounds = [];
 
     var soundObject;
 
@@ -775,6 +804,7 @@ var Record = function ($) {
 
             var globalTimestamp = previousTracksLength + soundObject.position;
             this.setArmRotation(globalTimestamp / totalTime);
+
         },
 
         setArmRotation: function (percent) {
@@ -795,11 +825,44 @@ var Record = function ($) {
                             $('.record label').css('background-image', 'url('+playlist.artwork_url+')');
                         }
 
-                        app.pages['record'].setTracks(playlist.tracks);
+                        var totalsounds = playlist.tracks.length;
 
-                        if(app.getCurrentPage() === 'record'){
-                            app.pages['record'].init();
-                        }
+                        playlist.tracks.forEach(function(track){
+                            SC.stream('/tracks/' + track.id, 
+                                {
+                                    autoLoad:true, 
+                                    
+
+
+                                }, 
+                                
+                                function(sound){
+                                    sounds.push(sound);
+                                    //console.log('pushed a sound.', totalsounds === sounds.length);
+
+                                    //All tracks loaded && the current page hasn't been changed
+                                    if(totalsounds === sounds.length && app.getCurrentPage() === 'record'){
+                                        app.pages['record'].init();
+                                    }
+
+
+                                });
+                        });
+
+
+
+                        tracks = playlist.tracks;
+                        totalTime = 0;
+
+                        tracks.forEach(function (track) {
+                            totalTime += track.duration;
+                        });
+
+                        this.setLabel();
+
+                        //app.pages['record'].setTracks(playlist.tracks);
+
+                        
 
                     }.bind(this));
                 }.bind(this), 2200);
@@ -928,7 +991,34 @@ var Record = function ($) {
                 soundObject.stop();
             } catch (err) { /*do nothing*/ }
 
-            if (this.getCurrentTrack() && this.getCurrentTrack() !== 'undefined') {
+            soundObject = sounds[currentTrack];
+
+            app.stopAllSounds();
+            app.playSoundEffect('crackling', false);
+
+            soundObject.play({
+
+                whileplaying: function () {
+
+                    if (!app.pages['record'].armMoving && soundObject.loaded) {
+                        app.pages.record.onPosition();
+                    }
+
+                },
+                onload: function () {
+
+                    soundObject.setVolume(100);
+                    soundObject.setPosition(position);
+
+                },
+                onfinish: function () {
+
+                    this.next();
+
+                }.bind(this)
+            });
+
+            /*if (this.getCurrentTrack() && this.getCurrentTrack() !== 'undefined') {
 
                 //Load the track
                 SC.stream('/tracks/' + this.getCurrentTrack().id, {
@@ -956,7 +1046,7 @@ var Record = function ($) {
                         }.bind(this)
                     });
                 }.bind(this));
-            }
+            }*/
 
         },
 
@@ -981,5 +1071,5 @@ $(document).ready(function(){
 app = new App(jQuery);
 app.addPage('menu', new Menu(jQuery));
 app.addPage('record', new Record(jQuery));
-app.addPage('television', new Television(jQuery));
+//app.addPage('television', new Television(jQuery));
 app.addPage('contact', new Contact(jQuery));
