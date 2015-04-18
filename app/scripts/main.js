@@ -747,8 +747,6 @@ var Record = function ($) {
 
     var tracks = [];
 
-    var sounds = [];
-
     var soundObject;
 
     var totalTime = 0;
@@ -804,7 +802,6 @@ var Record = function ($) {
 
             var globalTimestamp = previousTracksLength + soundObject.position;
             this.setArmRotation(globalTimestamp / totalTime);
-
         },
 
         setArmRotation: function (percent) {
@@ -825,44 +822,11 @@ var Record = function ($) {
                             $('.record label').css('background-image', 'url('+playlist.artwork_url+')');
                         }
 
-                        var totalsounds = playlist.tracks.length;
+                        app.pages['record'].setTracks(playlist.tracks);
 
-                        playlist.tracks.forEach(function(track){
-                            SC.stream('/tracks/' + track.id, 
-                                {
-                                    autoLoad:true, 
-                                    
-
-
-                                }, 
-                                
-                                function(sound){
-                                    sounds.push(sound);
-                                    //console.log('pushed a sound.', totalsounds === sounds.length);
-
-                                    //All tracks loaded && the current page hasn't been changed
-                                    if(totalsounds === sounds.length && app.getCurrentPage() === 'record'){
-                                        app.pages['record'].init();
-                                    }
-
-
-                                });
-                        });
-
-
-
-                        tracks = playlist.tracks;
-                        totalTime = 0;
-
-                        tracks.forEach(function (track) {
-                            totalTime += track.duration;
-                        });
-
-                        this.setLabel();
-
-                        //app.pages['record'].setTracks(playlist.tracks);
-
-                        
+                        if(app.getCurrentPage() === 'record'){
+                            app.pages['record'].init();
+                        }
 
                     }.bind(this));
                 }.bind(this), 2200);
@@ -991,34 +955,7 @@ var Record = function ($) {
                 soundObject.stop();
             } catch (err) { /*do nothing*/ }
 
-            soundObject = sounds[currentTrack];
-
-            app.stopAllSounds();
-            app.playSoundEffect('crackling', false);
-
-            soundObject.play({
-
-                whileplaying: function () {
-
-                    if (!app.pages['record'].armMoving && soundObject.loaded) {
-                        app.pages.record.onPosition();
-                    }
-
-                },
-                onload: function () {
-
-                    soundObject.setVolume(100);
-                    soundObject.setPosition(position);
-
-                },
-                onfinish: function () {
-
-                    this.next();
-
-                }.bind(this)
-            });
-
-            /*if (this.getCurrentTrack() && this.getCurrentTrack() !== 'undefined') {
+            if (this.getCurrentTrack() && this.getCurrentTrack() !== 'undefined') {
 
                 //Load the track
                 SC.stream('/tracks/' + this.getCurrentTrack().id, {
@@ -1046,7 +983,7 @@ var Record = function ($) {
                         }.bind(this)
                     });
                 }.bind(this));
-            }*/
+            }
 
         },
 
@@ -1071,5 +1008,5 @@ $(document).ready(function(){
 app = new App(jQuery);
 app.addPage('menu', new Menu(jQuery));
 app.addPage('record', new Record(jQuery));
-//app.addPage('television', new Television(jQuery));
+app.addPage('television', new Television(jQuery));
 app.addPage('contact', new Contact(jQuery));
