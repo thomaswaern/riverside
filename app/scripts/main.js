@@ -802,12 +802,14 @@ var Record = function ($) {
         },
 
         onPosition: function () {
-
-            var globalTimestamp = previousTracksLength + soundObject.position;
+            
+            var globalTimestamp = previousTracksLength + sounds[currentTrack].position;
             this.setArmRotation(globalTimestamp / totalTime);
+
         },
 
         setArmRotation: function (percent) {
+
             var value = ((1 - percent) * (75 - 24));
             $('.slider').val(value + 24, true);
         },
@@ -839,17 +841,14 @@ var Record = function ($) {
                                         $('.record_loader').css('transform', 'scale(' + loaded + ')');
                                         if(totalsounds === sounds.length && app.getCurrentPage() === 'record'){
                                             app.pages['record'].init();
-                                            $('.record_loader').css('transform', 'scale(0)');
+                                            setTimeout(function() {
+                                                $('.record_loader').css('opacity', '0');
+                                            }, 200);
                                         }
-                                    },
-                                    whileplaying: function () {
-                                        if (!app.pages['record'].armMoving) {
-                                            app.pages['record'].onPosition();
-                                        }
-                                    },
-                                    onfinish : function(){
-                                        app.pages['record'].next();
+
+
                                     }
+                                    
                                 });
                         });
 
@@ -943,16 +942,20 @@ var Record = function ($) {
 
             });
 
-            if ((soundObject && soundObject.playState > 0) && (currentTrack === trackNumber)) {
-                soundObject.setPosition(localTargetTime);
+            if ((sounds[currentTrack] && sounds[currentTrack].playState > 0) && (currentTrack === trackNumber)) {
+                 sounds[currentTrack].setPosition(localTargetTime);
+                 console.log('got samesong pos: ', position);
 
                 
             } else {
+                console.log('got new song pos: ', position);
+                sounds[currentTrack].stop();
                 currentTrack = trackNumber;
-
                 this.playCurrentTrack(localTargetTime);
 
             }
+
+
 
             ga('send', 'event', 'record', 'setPosition', this.getCurrentTrack().id + ' (' + localTargetTime + ')');
 
@@ -964,7 +967,7 @@ var Record = function ($) {
 
             //Stop current sound if any
             try {
-                soundObject.stop();
+                sounds[currentTrack].stop();
             } catch (err) { /*do nothing*/ }
 
             //Go to next track
@@ -983,48 +986,39 @@ var Record = function ($) {
 
         playCurrentTrack: function (position) {
 
-            if(!position > 0){
-                return;
-            }
-
-            //Stop current sound if any
-            try {
-                soundObject.stop();
-                app.stopAllSounds();
-            } catch (err) { /*do nothing*/ }
+           
 
             if (this.getCurrentTrack() && this.getCurrentTrack() !== 'undefined') {
-              
 
-                //Load the track
-                SC.stream('/tracks/' + this.getCurrentTrack().id, {
-                    /*whileplaying: function () {
-                        if (!app.pages['record'].armMoving && soundObject.loaded) {
-                            this.onPosition();
-                        }
-                    }.bind(this),
-                    autoLoad: true*/
-                }, function (sound) {
+                    //Stop current sound if any
+                    try {
+                        console.log(currentTrack, sounds[currentTrack]);
+                        app.stopAllSounds();
+                        sounds[currentTrack].stop();
 
-                    soundObject = sound;
-                    soundObject.setPosition(position);
-
-                    //console.log(app.pages['record'].getCurrentTrack().title);
+                    } catch (err) { console.log(err) }
 
                     app.playSoundEffect('crackling', false);
                     //soundObject.setVolume(0);
 
-                    soundObject.play({
-                       /* onload: function () {
-                            soundObject.setVolume(90);
-                            soundObject.setPosition(position);
+                    sounds[currentTrack].play({
+
+                        onload: function () {
+                            this.setVolume(90);
+                            console.log('LÖaD');
+                            //this.setPosition(position);
                         },
-                        onfinish: function () {
-                            console.log(this);
-                            this.next();
-                        }.bind(this)*/
+                        whileplaying: function () {
+                            if (this.loaded && !app.pages['record'].armMoving) {
+                                app.pages['record'].onPosition();
+                           
+                            }
+                        },
+                        onfinish : function(){
+                            app.pages['record'].next();
+                        }
                     });
-                }.bind(this));
+
             }
 
         },
@@ -1033,7 +1027,7 @@ var Record = function ($) {
 
             //Stop current sound if any
             try {
-                soundObject.stop();
+                sounds[currentTrack].stop();
             } catch (err) { /*do nothing*/ }
 
         },
