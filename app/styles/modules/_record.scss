@@ -129,6 +129,22 @@ $base-width:100% * 1.4;
 
 }
 
+.record_loader{
+	background:rgba(red, 0.3);
+	padding-bottom:$base-width;
+	width:$base-width;
+	height:0;
+	/* Position */
+	margin-left:-70%;
+	position: absolute;
+	left:0;
+	margin-top:-70%;
+	transform:scale(0);
+	transition:100ms;
+	border-radius:50%;
+
+}
+
 .hole{
 	background:black;
 	@include center(3%);
