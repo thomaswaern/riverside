@@ -754,6 +754,8 @@ var Record = function ($) {
 
     var totalTime = 0;
 
+    var previousTrack = 0;
+
     var currentTrack = 0;
 
     var previousTracksLength = 0;
@@ -803,7 +805,7 @@ var Record = function ($) {
 
         onPosition: function () {
             
-            var globalTimestamp = previousTracksLength + sounds[currentTrack].position;
+            var globalTimestamp = previousTracksLength + soundObject.position;
             this.setArmRotation(globalTimestamp / totalTime);
 
         },
@@ -832,6 +834,7 @@ var Record = function ($) {
                         var totalsounds = playlist.tracks.length;
                         playlist.tracks.forEach(function(track){
                             SC.stream('/tracks/' + track.id, 
+                                
                                 {
                                     autoLoad:true,
                                     onload : function(){
@@ -845,7 +848,6 @@ var Record = function ($) {
                                                 $('.record_loader').css('opacity', '0');
                                             }, 200);
                                         }
-
 
                                     }
                                     
@@ -942,20 +944,16 @@ var Record = function ($) {
 
             });
 
-            if ((sounds[currentTrack] && sounds[currentTrack].playState > 0) && (currentTrack === trackNumber)) {
-                 sounds[currentTrack].setPosition(localTargetTime);
-                 console.log('got samesong pos: ', position);
+            if ((soundObject && soundObject.playState > 0) && (currentTrack === trackNumber)) {
 
-                
+                 soundObject.setPosition(localTargetTime);
+
             } else {
-                console.log('got new song pos: ', position);
-                sounds[currentTrack].stop();
+
                 currentTrack = trackNumber;
                 this.playCurrentTrack(localTargetTime);
 
             }
-
-
 
             ga('send', 'event', 'record', 'setPosition', this.getCurrentTrack().id + ' (' + localTargetTime + ')');
 
@@ -967,7 +965,7 @@ var Record = function ($) {
 
             //Stop current sound if any
             try {
-                sounds[currentTrack].stop();
+                soundObject.stop();
             } catch (err) { /*do nothing*/ }
 
             //Go to next track
@@ -986,27 +984,26 @@ var Record = function ($) {
 
         playCurrentTrack: function (position) {
 
-           
-
             if (this.getCurrentTrack() && this.getCurrentTrack() !== 'undefined') {
 
                     //Stop current sound if any
                     try {
-                        console.log(currentTrack, sounds[currentTrack]);
-                        app.stopAllSounds();
-                        sounds[currentTrack].stop();
+                        soundObject.stop();
 
                     } catch (err) { console.log(err) }
 
+                    app.stopAllSounds();
                     app.playSoundEffect('crackling', false);
                     //soundObject.setVolume(0);
 
-                    sounds[currentTrack].play({
+                    soundObject = sounds[currentTrack];
 
-                        onload: function () {
+                    soundObject.play({
+
+                        onplay: function () {
                             this.setVolume(90);
                             console.log('LÖaD');
-                            //this.setPosition(position);
+                            this.setPosition(position);
                         },
                         whileplaying: function () {
                             if (this.loaded && !app.pages['record'].armMoving) {
@@ -1027,7 +1024,7 @@ var Record = function ($) {
 
             //Stop current sound if any
             try {
-                sounds[currentTrack].stop();
+                soundObject.stop();
             } catch (err) { /*do nothing*/ }
 
         },
