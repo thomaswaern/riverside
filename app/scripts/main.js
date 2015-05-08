@@ -805,7 +805,7 @@ var Record = function ($) {
 
         onPosition: function () {
             
-            var globalTimestamp = previousTracksLength + soundObject.position;
+            var globalTimestamp = previousTracksLength + sounds[currentTrack].position;
             this.setArmRotation(globalTimestamp / totalTime);
 
         },
@@ -944,9 +944,9 @@ var Record = function ($) {
 
             });
 
-            if ((soundObject && soundObject.playState > 0) && (currentTrack === trackNumber)) {
-
-                 soundObject.setPosition(localTargetTime);
+            if ((sounds[currentTrack] && sounds[currentTrack].playState > 0) && (currentTrack === trackNumber)) {
+               
+                sounds[currentTrack].setPosition(localTargetTime);
 
             } else {
 
@@ -965,7 +965,7 @@ var Record = function ($) {
 
             //Stop current sound if any
             try {
-                soundObject.stop();
+                sounds[currentTrack].stop();
             } catch (err) { /*do nothing*/ }
 
             //Go to next track
@@ -988,7 +988,7 @@ var Record = function ($) {
 
                     //Stop current sound if any
                     try {
-                        soundObject.stop();
+                        sounds[currentTrack].stop();
 
                     } catch (err) { console.log(err) }
 
@@ -996,13 +996,17 @@ var Record = function ($) {
                     app.playSoundEffect('crackling', false);
                     //soundObject.setVolume(0);
 
-                    soundObject = sounds[currentTrack];
+                    sounds.forEach(function(sound){
+                        console.log(sound);
+                        sound.stop();
+                    });
 
-                    soundObject.play({
+                    //soundObject = sounds[currentTrack];
+                    
+                    sounds[currentTrack].play({
 
                         onplay: function () {
                             this.setVolume(90);
-                            console.log('LÖaD');
                             this.setPosition(position);
                         },
                         whileplaying: function () {
@@ -1024,7 +1028,7 @@ var Record = function ($) {
 
             //Stop current sound if any
             try {
-                soundObject.stop();
+                sounds[currentTrack].stop();
             } catch (err) { /*do nothing*/ }
 
         },
