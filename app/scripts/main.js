@@ -752,11 +752,15 @@ var Record = function ($) {
 
     var soundObject;
 
+    var position;
+
     var totalTime = 0;
 
     var previousTrack = 0;
 
     var currentTrack = 0;
+
+    var locked = true;
 
     var previousTracksLength = 0;
 
@@ -804,9 +808,13 @@ var Record = function ($) {
         },
 
         onPosition: function () {
-            
+
             var globalTimestamp = previousTracksLength + sounds[currentTrack].position;
-            this.setArmRotation(globalTimestamp / totalTime);
+
+            if(!locked){
+                this.setArmRotation(globalTimestamp / totalTime);
+            }
+            
 
         },
 
@@ -849,8 +857,28 @@ var Record = function ($) {
                                             }, 200);
                                         }
 
+                                    },
+
+                                    onStop : function(){
+                                        console.log('stopping', this);
+                                    },
+
+                                    onplay: function () {
+                                        console.log('playing', this);
+                                        this.setVolume(90);
+                                        this.setPosition();
+                                    },
+
+                                    whileplaying: function () {
+                                        if (this.loaded && !app.pages['record'].armMoving && !locked) {
+                                            app.pages['record'].onPosition();                                       
+                                        }
+                                    },
+
+                                    onfinish : function(){
+                                        app.pages['record'].next();
                                     }
-                                    
+                                                
                                 });
                         });
 
@@ -984,6 +1012,10 @@ var Record = function ($) {
 
         playCurrentTrack: function (position) {
 
+            locked = true;
+
+            this.position = position;
+
             if (this.getCurrentTrack() && this.getCurrentTrack() !== 'undefined') {
 
                     //Stop current sound if any
@@ -997,28 +1029,18 @@ var Record = function ($) {
                     //soundObject.setVolume(0);
 
                     sounds.forEach(function(sound){
-                        console.log(sound);
                         sound.stop();
+                        soundManager.stopAll();
+                        
+                        console.log(sound.playState);
                     });
 
                     //soundObject = sounds[currentTrack];
-                    
-                    sounds[currentTrack].play({
+                    console.log('trying to play', currentTrack);
 
-                        onplay: function () {
-                            this.setVolume(90);
-                            this.setPosition(position);
-                        },
-                        whileplaying: function () {
-                            if (this.loaded && !app.pages['record'].armMoving) {
-                                app.pages['record'].onPosition();
-                           
-                            }
-                        },
-                        onfinish : function(){
-                            app.pages['record'].next();
-                        }
-                    });
+                    sounds[currentTrack].play();
+
+                    locked = false;
 
             }
 
